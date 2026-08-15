@@ -2014,7 +2014,6 @@ function initYouTubePlayer() {
     }, 100);
 
 }
-}
 
 
 function bindVideoCards() {
