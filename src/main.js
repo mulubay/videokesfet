@@ -16,7 +16,8 @@ const state = {
   videos: [],
   categories: [],
   user: null,
-  isAdmin: false
+  isAdmin: false,
+  selectedVideo: null
 };
 
 function youtubeId(url = "") {
@@ -339,6 +340,10 @@ function page() {
     return discoverPage();
   }
 
+  if (state.view === "watch") {
+    return watchPage();
+  }
+
   if (state.view === "submit") {
     return submitPage();
   }
@@ -503,6 +508,110 @@ function discoverPage() {
         }
 
       </div>
+
+    </section>
+  `;
+}
+
+function watchPage() {
+  const video = state.selectedVideo;
+
+  if (!video) {
+    return `
+      <section class="container narrow page-top">
+        <div class="notice">
+          Video bulunamadı.
+          <br><br>
+
+          <button
+            class="button primary"
+            data-view="discover"
+          >
+            Keşfet'e Dön
+          </button>
+        </div>
+      </section>
+    `;
+  }
+
+  const embedId =
+    youtubeId(video.youtube_url) ||
+    video.youtube_id;
+
+  return `
+    <section
+      class="container narrow page-top"
+    >
+
+      <button
+        class="link"
+        data-view="discover"
+      >
+        ← Keşfet'e dön
+      </button>
+
+      <div class="video-player">
+
+        <div class="video-frame">
+
+          <iframe
+            src="https://www.youtube.com/embed/${escapeHtml(embedId)}"
+            title="${escapeHtml(
+              video.title || "YouTube videosu"
+            )}"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+
+        </div>
+
+      </div>
+
+      <span class="tag">
+        ${escapeHtml(
+          video.categories?.name ||
+          "Diğer"
+        )}
+      </span>
+
+      <h1>
+        ${escapeHtml(
+          video.title ||
+          "Başlıksız video"
+        )}
+      </h1>
+
+      <p class="lead">
+        ${escapeHtml(
+          video.profiles?.display_name ||
+          video.profiles?.username ||
+          "İçerik üreticisi"
+        )}
+      </p>
+
+      ${
+        video.description
+          ? `
+            <p>
+              ${escapeHtml(
+                video.description
+              )}
+            </p>
+          `
+          : ""
+      }
+
+      <a
+        class="button secondary"
+        href="${escapeHtml(
+          video.youtube_url
+        )}"
+        target="_blank"
+        rel="noopener"
+      >
+        YouTube'da Aç ↗
+      </a>
 
     </section>
   `;
@@ -869,6 +978,46 @@ async function refreshAndRender(
 function bind() {
 
   document
+    .querySelectorAll(".video-card-button")
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+          const videoId =
+            button.dataset.videoId;
+
+          if (!videoId) return;
+
+          const selectedVideo =
+            state.videos.find(
+              (video) =>
+                video.youtube_id === videoId
+            );
+
+          if (!selectedVideo) return;
+
+          state.selectedVideo =
+            selectedVideo;
+
+          state.view = "watch";
+
+          render();
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
+        }
+      );
+
+    });
+
+  document
     .querySelectorAll("[data-view]")
     .forEach((button) => {
 
@@ -911,6 +1060,7 @@ function bind() {
 
         state.user = null;
         state.isAdmin = false;
+        state.selectedVideo = null;
         state.view = "home";
         state.videos = [];
 
@@ -931,9 +1081,11 @@ function bind() {
           document
             .querySelectorAll(".filter")
             .forEach((filter) => {
+
               filter.classList.remove(
                 "active"
               );
+
             });
 
           button.classList.add(
@@ -972,12 +1124,16 @@ function bind() {
                 .join("") ||
               emptyState();
 
+            bindVideoCards();
+
           }
 
         }
       );
 
     });
+
+  bindVideoCards();
 
   document
     .querySelector("#auth-form")
@@ -1152,6 +1308,49 @@ function bind() {
             button.dataset.id,
             "rejected"
           );
+
+        }
+      );
+
+    });
+}
+
+function bindVideoCards() {
+
+  document
+    .querySelectorAll(".video-card-button")
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+          const videoId =
+            button.dataset.videoId;
+
+          if (!videoId) return;
+
+          const selectedVideo =
+            state.videos.find(
+              (video) =>
+                video.youtube_id === videoId
+            );
+
+          if (!selectedVideo) return;
+
+          state.selectedVideo =
+            selectedVideo;
+
+          state.view = "watch";
+
+          render();
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
 
         }
       );
