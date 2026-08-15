@@ -18,6 +18,7 @@ const state = {
   user: null,
   profile: null,
   myVideos: [],
+  pointTransactions: [],
   isAdmin: false,
   selectedVideo: null
 };
