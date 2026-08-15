@@ -16,6 +16,8 @@ const state = {
   videos: [],
   categories: [],
   user: null,
+  profile: null,
+  myVideos: [],
   isAdmin: false,
   selectedVideo: null
 };
