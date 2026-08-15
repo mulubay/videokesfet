@@ -1612,39 +1612,7 @@ document
           const id =
             button.dataset.category;
 state.selectedCategory = id;
-          const approvedVideos =
-            state.videos.filter(
-              (video) =>
-                video.status === "approved"
-            );
-
-          const list =
-            id === "all"
-              ? approvedVideos
-              : approvedVideos.filter(
-                  (video) =>
-                    String(
-                      video.category_id
-                    ) === id
-                );
-
-          const grid =
-            document.querySelector(
-              "#discover-grid"
-            );
-
-          if (grid) {
-
-            grid.innerHTML =
-              list
-                .map(videoCard)
-                .join("") ||
-              emptyState();
-
-            bindVideoCards();
-
-          }
-
+applyDiscoverFilters();
         }
       );
 
