@@ -1075,6 +1075,49 @@ function loginPage() {
   </p>
 
 </div>
+<div class="profile-edit-card">
+
+  <div class="section-head">
+    <h2>🏆 Puan Nasıl Kazanılır?</h2>
+  </div>
+
+  <div class="point-rules">
+
+    <div class="point-rule">
+      <div>
+        <strong>30 saniye video izle</strong>
+        <span>Bir videoyu en az 30 saniye izle.</span>
+      </div>
+      <strong class="point-amount">+5</strong>
+    </div>
+
+    <div class="point-rule">
+      <div>
+        <strong>Günlük giriş yap</strong>
+        <span>Her gün hesabına giriş yap.</span>
+      </div>
+      <strong class="point-amount">+2</strong>
+    </div>
+
+    <div class="point-rule">
+      <div>
+        <strong>Arkadaşını davet et</strong>
+        <span>Arkadaşın kayıt olup daveti tamamladığında.</span>
+      </div>
+      <strong class="point-amount">+20</strong>
+    </div>
+
+    <div class="point-rule">
+      <div>
+        <strong>Davet koduyla kayıt ol</strong>
+        <span>Bir arkadaşının davet koduyla kayıt olduğunda.</span>
+      </div>
+      <strong class="point-amount">+40</strong>
+    </div>
+
+  </div>
+
+</div>
       <div class="section-head">
         <h2>Puan Geçmişi</h2>
       </div>
