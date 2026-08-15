@@ -212,7 +212,7 @@ async function loadData() {
     const { data: profile, error: profileError } =
       await supabase
         .from("profiles")
-        .select("role, username, display_name")
+        .select("role, username, display_name, points")
         .eq("id", state.user.id)
         .maybeSingle();
 
