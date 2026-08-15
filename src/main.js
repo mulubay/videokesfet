@@ -392,6 +392,9 @@ function render() {
   `;
 
   bind();
+    if (state.view === "watch") {
+    initYouTubePlayer();
+  }
 }
 
 function page() {
