@@ -21,7 +21,8 @@ const state = {
   pointTransactions: [],
   isAdmin: false,
   selectedVideo: null,
-  selectedCategory: "all"
+  selectedCategory: "all",
+  selectedVideoType: "all"
 };
 
 
