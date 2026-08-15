@@ -1000,7 +1000,22 @@ function loginPage() {
               required
             >
           </label>
+<label>
+  YouTube Kanalım
 
+  <input
+    id="profile-youtube-channel"
+    type="url"
+    value="${escapeHtml(
+      state.profile?.youtube_channel_url || ""
+    )}"
+    placeholder="https://www.youtube.com/@kanaliniz"
+  >
+
+  <small class="muted">
+    Kendi YouTube kanalınızın adresini girin.
+  </small>
+</label>
           <button
             class="button primary"
             type="submit"
