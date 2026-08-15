@@ -1297,30 +1297,19 @@ function loginPage() {
 
                   const status =
                     video.status || "pending";
-
+const thumb =
+  video.thumbnail_url ||
+  `https://i.ytimg.com/vi/${video.youtube_id}/hqdefault.jpg`;
                   return `
                     <article class="card my-video-card">
 
   <div class="video-card-thumb">
 
-    ${
-      video.thumbnail_url
-        ? `
-          <img
-            src="${escapeHtml(
-              video.thumbnail_url
-            )}"
-            alt=""
-            loading="lazy"
-          >
-        `
-        : `
-          <div class="video-thumb-placeholder">
-            Video
-          </div>
-        `
-    }
-
+   <img
+  src="${escapeHtml(thumb)}"
+  alt=""
+  loading="lazy"
+>
   </div>
 
   <div class="card-body">
