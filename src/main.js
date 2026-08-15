@@ -667,19 +667,17 @@ function watchPage() {
           : ""
       }
 
-      <a
-        id="youtube-external-link"
-        class="button secondary disabled"
-        href="${escapeHtml(
-          video.youtube_url
-        )}"
-        target="_blank"
-        rel="noopener"
-        aria-disabled="true"
-        tabindex="-1"
-      >
-        🔒 YouTube'da Aç
-      </a>
+    <button
+  id="youtube-external-link"
+  class="button secondary"
+  type="button"
+  disabled
+  data-youtube-url="${escapeHtml(
+    video.youtube_url
+  )}"
+>
+  🔒 YouTube'da Aç
+</button>
 
     </section>
   `;
