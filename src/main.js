@@ -1610,7 +1610,8 @@ function applyDiscoverFilters() {
   const approvedVideos =
     state.videos.filter(
       (video) =>
-        video.status === "approved"
+      video.status === "approved" &&
+      video.user_id !== state.user?.id
     );
 
   const list =
