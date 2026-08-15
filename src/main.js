@@ -23,19 +23,7 @@ const state = {
   selectedVideo: null
 };
 
-function youtubeId(url = "") {
-  try {
-    const u = new URL(url);
 
-    if (u.hostname.includes("youtu.be")) {
-      return u.pathname.slice(1);
-    }
-
-    return u.searchParams.get("v") || "";
-  } catch {
-    return "";
-  }
-}
 
 function escapeHtml(value = "") {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({
@@ -46,7 +34,49 @@ function escapeHtml(value = "") {
     "'": "&#039;"
   }[c]));
 }
+function youtubeId(url = "") {
+  try {
+    const u = new URL(url);
 
+    // youtu.be/VIDEO_ID
+    if (u.hostname.includes("youtu.be")) {
+      return u.pathname
+        .split("/")
+        .filter(Boolean)[0] || "";
+    }
+
+    // youtube.com/watch?v=VIDEO_ID
+    const watchId =
+      u.searchParams.get("v");
+
+    if (watchId) {
+      return watchId;
+    }
+
+    // youtube.com/shorts/VIDEO_ID
+    if (
+      u.pathname.startsWith("/shorts/")
+    ) {
+      return u.pathname
+        .split("/")
+        .filter(Boolean)[1] || "";
+    }
+
+    // youtube.com/embed/VIDEO_ID
+    if (
+      u.pathname.startsWith("/embed/")
+    ) {
+      return u.pathname
+        .split("/")
+        .filter(Boolean)[1] || "";
+    }
+
+    return "";
+
+  } catch {
+    return "";
+  }
+}
 function videoCard(v) {
   const thumb =
     v.thumbnail_url ||
