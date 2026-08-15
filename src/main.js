@@ -1266,7 +1266,14 @@ function emptyState() {
 async function refreshAndRender(
   view = state.view
 ) {
-if (
+
+  console.log(
+  "REFERRAL BLOĞUNA GELDİ",
+  action,
+  result.data?.user?.id
+);
+  
+  if (
   action === "signup" &&
   result.data?.user
 ) {
