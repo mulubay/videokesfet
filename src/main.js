@@ -1794,24 +1794,33 @@ function initYouTubePlayer() {
 
       unlocked = true;
 
-      if (externalLink) {
+     if (externalLink) {
 
-        externalLink.classList.remove(
-          "disabled"
+  externalLink.disabled = false;
+
+  externalLink.textContent =
+    "YouTube'da Aç ↗";
+
+  externalLink.addEventListener(
+    "click",
+    () => {
+
+      const url =
+        externalLink.dataset.youtubeUrl;
+
+      if (url) {
+        window.open(
+          url,
+          "_blank",
+          "noopener,noreferrer"
         );
-
-        externalLink.removeAttribute(
-          "aria-disabled"
-        );
-
-        externalLink.removeAttribute(
-          "tabindex"
-        );
-
-        externalLink.textContent =
-          "YouTube'da Aç ↗";
-
       }
+
+    },
+    { once: true }
+  );
+
+}
 
       if (progressElement) {
 
