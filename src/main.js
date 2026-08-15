@@ -224,6 +224,25 @@ async function loadData() {
     }
 
     state.isAdmin = profile?.role === "admin";
+    state.profile = profile || null;
+
+const { data: myVideos, error: myVideosError } =
+  await supabase
+    .from("videos")
+    .select("*, categories(name)")
+    .eq("user_id", state.user.id)
+    .order("created_at", { ascending: false });
+
+if (myVideosError) {
+  console.error(
+    "My videos loading error:",
+    myVideosError
+  );
+
+  state.myVideos = [];
+} else {
+  state.myVideos = myVideos || [];
+}
   }
 
   let videoQuery = supabase
