@@ -2291,7 +2291,147 @@ function initYouTubePlayer() {
     }, 100);
 
 }
+async function loadReferralProfile() {
 
+  if (!supabase || !state.user) {
+    return;
+  }
+
+  const codeElement =
+    document.querySelector(
+      "#referral-code"
+    );
+
+  const countElement =
+    document.querySelector(
+      "#referral-count"
+    );
+
+  const copyButton =
+    document.querySelector(
+      "#copy-referral-link"
+    );
+
+  const messageElement =
+    document.querySelector(
+      "#referral-message"
+    );
+
+  if (
+    !codeElement ||
+    !countElement ||
+    !copyButton
+  ) {
+    return;
+  }
+
+  // Kullanıcının davet kodunu getir
+  const {
+    data: referralCode,
+    error: codeError
+  } = await supabase
+    .from("referral_codes")
+    .select("code")
+    .eq("user_id", state.user.id)
+    .maybeSingle();
+
+  if (codeError) {
+
+    console.error(
+      "Davet kodu alınamadı:",
+      codeError
+    );
+
+    codeElement.textContent =
+      "Kod alınamadı";
+
+    return;
+  }
+
+  if (!referralCode?.code) {
+
+    codeElement.textContent =
+      "Davet kodu bulunamadı";
+
+    return;
+  }
+
+  const code =
+    referralCode.code;
+
+  codeElement.textContent =
+    code;
+
+  // Başarılı davet sayısı
+  const {
+    count,
+    error: countError
+  } = await supabase
+    .from("referrals")
+    .select(
+      "id",
+      {
+        count: "exact",
+        head: true
+      }
+    )
+    .eq(
+      "inviter_id",
+      state.user.id
+    );
+
+  if (countError) {
+
+    console.error(
+      "Davet sayısı alınamadı:",
+      countError
+    );
+
+    countElement.textContent =
+      "Başarılı davetlerin: 0 / 20";
+
+  } else {
+
+    countElement.textContent =
+      `Başarılı davetlerin: ${
+        count || 0
+      } / 20`;
+  }
+
+  // Davet linki
+  const referralLink =
+    `${window.location.origin}/?ref=${encodeURIComponent(
+      code
+    )}`;
+
+  copyButton.disabled = false;
+
+  copyButton.addEventListener(
+    "click",
+    async () => {
+
+      try {
+
+        await navigator.clipboard.writeText(
+          referralLink
+        );
+
+        messageElement.textContent =
+          "Davet linki kopyalandı!";
+
+      } catch (error) {
+
+        console.error(
+          "Link kopyalanamadı:",
+          error
+        );
+
+        messageElement.textContent =
+          referralLink;
+      }
+    }
+  );
+}
 
 function bindVideoCards() {
 
