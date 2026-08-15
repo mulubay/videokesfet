@@ -351,7 +351,26 @@ if (myVideosError) {
     state.videos = vids || [];
   }
 }
+function captureReferralCode() {
+  const ref =
+    new URLSearchParams(
+      window.location.search
+    ).get("ref");
 
+  if (ref) {
+    localStorage.setItem(
+      "referral_code",
+      ref.toUpperCase()
+    );
+
+    console.log(
+      "DAVET KODU KAYDEDİLDİ:",
+      ref.toUpperCase()
+    );
+  }
+}
+
+captureReferralCode();
 function render() {
   app.innerHTML = `
 
