@@ -777,13 +777,44 @@ function watchPage() {
         </div>
 
       </div>
+<div class="watch-reward-card">
 
-      <div
-        id="watch-progress"
-        class="watch-progress"
-      >
-        Video hazırlanıyor...
-      </div>
+  <div class="watch-reward-header">
+
+    <div>
+      <strong>
+        ⭐ İzleme Ödülü
+      </strong>
+
+      <span>
+        30 saniye izle
+      </span>
+    </div>
+
+    <strong id="watch-reward-points">
+      +5 Puan
+    </strong>
+
+  </div>
+
+  <div class="watch-progress-bar">
+
+    <div
+      id="watch-progress-fill"
+      class="watch-progress-fill"
+      style="width: 0%;"
+    ></div>
+
+  </div>
+
+  <div
+    id="watch-progress"
+    class="watch-progress"
+  >
+    Video hazırlanıyor...
+  </div>
+
+</div>
 
       <span class="tag">
         ${escapeHtml(
@@ -2327,7 +2358,10 @@ function initYouTubePlayer() {
     document.querySelector(
       "#watch-progress"
     );
-
+const progressFill =
+  document.querySelector(
+    "#watch-progress-fill"
+  );
   let player = null;
   let interval = null;
 
