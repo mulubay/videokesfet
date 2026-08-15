@@ -1467,32 +1467,72 @@ async function updateVideoStatus(
       "Güncelleniyor...";
   }
 
-  const { error } =
-    await supabase
-      .from("videos")
-      .update({
-        status
-      })
-      .eq("id", videoId);
+  // Video onaylama işlemi artık
+  // güvenli Supabase fonksiyonu üzerinden yapılacak.
+  if (status === "approved") {
 
-  if (error) {
+    const { data, error } =
+      await supabase.rpc(
+        "approve_video",
+        {
+          p_video_id: videoId
+        }
+      );
 
-    console.error(
-      "Video status update error:",
-      error
-    );
+    if (error) {
 
-    if (message) {
-      message.textContent =
-        `İşlem başarısız: ${error.message}`;
+      console.error(
+        "Video approval error:",
+        error
+      );
+
+      if (message) {
+        message.textContent =
+          `İşlem başarısız: ${error.message}`;
+      }
+
+      return;
     }
 
-    return;
+    if (data === false) {
+
+      if (message) {
+        message.textContent =
+          "Video zaten onaylanmış.";
+      }
+
+      return;
+    }
+
+  } else {
+
+    // Reddetme şimdilik mevcut sistemle devam ediyor.
+    const { error } =
+      await supabase
+        .from("videos")
+        .update({
+          status
+        })
+        .eq("id", videoId);
+
+    if (error) {
+
+      console.error(
+        "Video status update error:",
+        error
+      );
+
+      if (message) {
+        message.textContent =
+          `İşlem başarısız: ${error.message}`;
+      }
+
+      return;
+    }
+
   }
 
-  await refreshAndRender(
-    "admin"
-  );
+  await refreshAndRender("admin");
 }
 
 (async () => {
