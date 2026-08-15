@@ -848,8 +848,6 @@ function loginPage() {
   `;
 }
 
-
-</div>
   function profilePage() {
   const points = state.profile?.points ?? 0;
 
