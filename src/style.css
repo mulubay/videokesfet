@@ -89,3 +89,22 @@
   filter: grayscale(1);
 }
 
+/* PROFİL FORMU - DAHA BÜYÜK ALANLAR */
+
+#profile-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+#profile-form label {
+  display: block;
+  margin-bottom: 18px;
+}
+
+#profile-form small {
+  display: block;
+  margin-top: 6px;
+}
