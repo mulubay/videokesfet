@@ -551,7 +551,8 @@ function homePage() {
   const videos = state.videos
     .filter(
       (video) =>
-        video.status === "approved"
+   video.status === "approved" &&
+      video.user_id !== state.user?.id
     )
     .slice(0, 6);
 
