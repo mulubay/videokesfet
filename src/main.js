@@ -1092,36 +1092,48 @@ function bind() {
 
     });
 
-  document
-    .querySelectorAll("[data-view]")
-    .forEach((button) => {
+ document
+  .querySelectorAll("[data-view]")
+  .forEach((button) => {
 
-      button.addEventListener(
-        "click",
-        async (event) => {
+    button.addEventListener(
+      "click",
+      async (event) => {
 
-          event.preventDefault();
+        event.preventDefault();
 
-          const targetView =
-            button.getAttribute(
-              "data-view"
-            );
+        const targetView =
+          button.getAttribute(
+            "data-view"
+          );
 
-          if (!targetView) return;
+        if (!targetView) return;
 
-          state.view = targetView;
+        state.view = targetView;
 
-          render();
-
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-          });
-
+        /*
+         * Profil sayfasına girildiğinde
+         * Supabase'deki güncel puanı ve
+         * videoları yeniden çek.
+         */
+        if (
+          targetView === "profile" &&
+          state.user
+        ) {
+          await loadData();
         }
-      );
 
-    });
+        render();
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+
+      }
+    );
+
+  });
 
   document
     .querySelector("#logout")
