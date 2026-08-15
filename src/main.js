@@ -1570,9 +1570,14 @@ if (profileForm) {
 
         const form =
           new FormData(event.target);
+const action =
+  event.submitter?.value ||
+  form.get("action");
 
-        const action =
-          form.get("action");
+console.log(
+  "AUTH ACTION:",
+  action
+);
 
         const email =
           form.get("email");
