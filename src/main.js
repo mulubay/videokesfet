@@ -226,7 +226,28 @@ async function loadData() {
 
     state.isAdmin = profile?.role === "admin";
     state.profile = profile || null;
+const {
+  data: pointTransactions,
+  error: pointTransactionsError
+} = await supabase
+  .from("point_transactions")
+  .select("amount, reason, created_at")
+  .eq("user_id", state.user.id)
+  .order("created_at", {
+    ascending: false
+  });
 
+if (pointTransactionsError) {
+  console.error(
+    "Point transactions loading error:",
+    pointTransactionsError
+  );
+
+  state.pointTransactions = [];
+} else {
+  state.pointTransactions =
+    pointTransactions || [];
+}
 const { data: myVideos, error: myVideosError } =
   await supabase
     .from("videos")
