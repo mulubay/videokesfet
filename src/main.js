@@ -848,83 +848,9 @@ function loginPage() {
   `;
 }
 
-function profilePage() {
-  const points = state.profile?.points ?? 0;
 
-  return `
-    <section class="container narrow page-top">
-
-      <p class="eyebrow">
-        PROFİL
-      </p>
-
-      <h1>
-        ${escapeHtml(
-          state.profile?.display_name ||
-          state.profile?.username ||
-          state.user?.email ||
-          "Kullanıcı"
-        )}
-      </h1>
-
-      <p class="lead">
-        ${escapeHtml(state.user?.email || "")}
-      </p>
-
-      <div class="profile-stat">
-        <strong>${points}</strong>
-        <span>Puan</span>
-      </div>
-<div class="section-head">
-  <h2>Puan Geçmişi</h2>
 </div>
-
-<div class="point-history">
-  ${
-    state.pointTransactions.length
-      ? state.pointTransactions
-          .map((transaction) => {
-            const amount =
-              Number(transaction.amount);
-
-            const sign =
-              amount > 0 ? "+" : "";
-
-            const date =
-              new Date(
-                transaction.created_at
-              ).toLocaleString("tr-TR");
-
-            return `
-              <div class="point-history-item">
-
-                <div>
-                  <strong>
-                    ${escapeHtml(
-                      transaction.reason
-                    )}
-                  </strong>
-
-                  <small>
-                    ${escapeHtml(date)}
-                  </small>
-                </div>
-
-                <span class="point-amount">
-                  ${sign}${amount} puan
-                </span>
-
-              </div>
-            `;
-          })
-          .join("")
-      : `
-        <div class="empty">
-          Henüz puan hareketi yok.
-        </div>
-      `
-  }
-</div>function profilePage() {
+  function profilePage() {
   const points = state.profile?.points ?? 0;
 
   const username =
