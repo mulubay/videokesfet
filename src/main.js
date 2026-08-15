@@ -1724,9 +1724,7 @@ if (profileForm) {
 function initYouTubePlayer() {
 
   const playerElement =
-    document.querySelector(
-      "#youtube-player"
-    );
+    document.querySelector("#youtube-player");
 
   if (!playerElement) return;
 
@@ -1749,103 +1747,329 @@ function initYouTubePlayer() {
   let interval = null;
   let unlocked = false;
 
-  function updateWatchProgress() {
+  function updateProgress() {
 
-    if (!player || !player.getDuration) {
-      return;
-    }
+    if (!player) return;
 
-    const duration =
-      player.getDuration();
+    try {
 
-    const currentTime =
-      player.getCurrentTime();
+      const duration =
+        player.getDuration();
 
-    if (!duration || duration <= 0) {
-      return;
-    }
+      const currentTime =
+        player.getCurrentTime();
 
-    /*
-     * YouTube butonunun açılma süresi:
-     *
-     * Video süresinin %50'si
-     * VEYA
-     * 30 saniye
-     *
-     * hangisi daha kısa ise.
-     */
-
-    const requiredSeconds =
-      Math.min(
-        30,
-        duration * 0.5
-      );
-
-    const remaining =
-      Math.max(
-        0,
-        requiredSeconds - currentTime
-      );
-
-    if (
-      currentTime >= requiredSeconds &&
-      !unlocked
-    ) {
-
-      unlocked = true;
-
-     if (externalLink) {
-
-  externalLink.disabled = false;
-
-  externalLink.textContent =
-    "YouTube'da Aç ↗";
-
-  externalLink.addEventListener(
-    "click",
-    () => {
-
-      const url =
-        externalLink.dataset.youtubeUrl;
-
-      if (url) {
-        window.open(
-          url,
-          "_blank",
-          "noopener,noreferrer"
-        );
+      if (!duration || duration <= 0) {
+        return;
       }
 
-    },
-    { once: true }
-  );
+      /*
+       * Kural:
+       *
+       * Video 60 saniyeden uzunsa:
+       *     30 saniye izle
+       *
+       * Video 60 saniyeden kısaysa:
+       *     videonun %50'sini izle
+       */
 
-}
+      const requiredSeconds =
+        Math.min(
+          30,
+          duration * 0.5
+        );
+
+      const remaining =
+        Math.max(
+          0,
+          requiredSeconds - currentTime
+        );
+
+      console.log(
+        "Video süresi:",
+        duration,
+        "İzlenen:",
+        currentTime,
+        "Gerekli:",
+        requiredSeconds
+      );
+
+      if (
+        currentTime >= requiredSeconds &&
+        !unlocked
+      ) {
+
+        unlocked = true;
+
+        if (externalLink) {
+
+          externalLink.disabled = false;
+
+          externalLink.textContent =
+            "YouTube'da Aç ↗";
+
+          externalLink.onclick = () => {
+
+            const url =
+              externalLink.dataset.youtubeUrl;
+
+            if (url) {
+              window.open(
+                url,
+                "_blank",
+                "noopener,noreferrer"
+              );
+            }
+
+          };
+        }
+
+        if (progressElement) {
+
+          progressElement.textContent =
+            "🔓 YouTube bağlantısı artık açılabilir.";
+
+        }
+
+        if (interval) {
+
+          clearInterval(interval);
+          interval = null;
+
+        }
+
+        return;
+      }
 
       if (progressElement) {
 
         progressElement.textContent =
-          "YouTube bağlantısı açıldı.";
+          `🔒 YouTube bağlantısı için ${Math.ceil(
+            remaining
+          )} saniye daha izle.`;
+
       }
 
-      return;
+    } catch (error) {
+
+      console.error(
+        "Video süre kontrolü hatası:",
+        error
+      );
+
     }
-
-  if (progressElement) {
-
-  progressElement.textContent =
-    `🔒 YouTube bağlantısı için ${Math.ceil(
-      remaining
-    )} saniye daha izle.`;
-
-}
-    if (progressElement) {
-
-  progressElement.textContent =
-    "🔓 YouTube bağlantısı artık açılabilir.";
-
-}
   }
+
+  function startTracking() {
+
+    if (interval) return;
+
+    console.log(
+      "Video oynatma takibi başladı."
+    );
+
+    updateProgress();
+
+    interval =
+      setInterval(
+        updateProgress,
+        1000
+      );
+  }
+
+  function stopTracking() {
+
+    if (!interval) return;
+
+    clearInterval(interval);
+
+    interval = null;
+
+    console.log(
+      "Video oynatma takibi durdu."
+    );
+  }
+
+  function createPlayer() {
+
+    if (player) return;
+
+    const element =
+      document.querySelector(
+        "#youtube-player"
+      );
+
+    if (!element) return;
+
+    console.log(
+      "YouTube Player oluşturuluyor:",
+      videoId
+    );
+
+    player =
+      new YT.Player(
+        "youtube-player",
+        {
+
+          videoId: videoId,
+
+          playerVars: {
+            autoplay: 0,
+            rel: 0,
+            modestbranding: 1
+          },
+
+          events: {
+
+            onReady: () => {
+
+              console.log(
+                "YouTube Player hazır."
+              );
+
+              if (progressElement) {
+
+                progressElement.textContent =
+                  "▶ Videoyu oynatın.";
+
+              }
+
+            },
+
+            onStateChange: (event) => {
+
+              console.log(
+                "YouTube Player durumu:",
+                event.data
+              );
+
+              if (
+                event.data ===
+                YT.PlayerState.PLAYING
+              ) {
+
+                startTracking();
+
+              } else {
+
+                stopTracking();
+
+              }
+
+            },
+
+            onError: (event) => {
+
+              console.error(
+                "YouTube Player hatası:",
+                event.data
+              );
+
+              if (progressElement) {
+
+                progressElement.textContent =
+                  "Video oynatılamadı.";
+
+              }
+
+            }
+
+          }
+
+        }
+      );
+  }
+
+  /*
+   * YouTube API zaten hazırsa
+   * hemen player oluştur.
+   */
+
+  if (
+    window.YT &&
+    typeof window.YT.Player ===
+      "function"
+  ) {
+
+    createPlayer();
+
+    return;
+  }
+
+  /*
+   * API henüz yüklenmemişse
+   * script'i yalnızca bir kez ekle.
+   */
+
+  let script =
+    document.querySelector(
+      'script[src="https://www.youtube.com/iframe_api"]'
+    );
+
+  if (!script) {
+
+    script =
+      document.createElement(
+        "script"
+      );
+
+    script.src =
+      "https://www.youtube.com/iframe_api";
+
+    document.head.appendChild(
+      script
+    );
+
+  }
+
+  /*
+   * Callback yerine kısa aralıklarla
+   * API'nin hazır olup olmadığını kontrol ediyoruz.
+   *
+   * Bu yöntem önceki callback çakışmasını
+   * ortadan kaldırıyor.
+   */
+
+  let attempts = 0;
+
+  const apiCheck =
+    setInterval(() => {
+
+      attempts++;
+
+      if (
+        window.YT &&
+        typeof window.YT.Player ===
+          "function"
+      ) {
+
+        clearInterval(apiCheck);
+
+        createPlayer();
+
+        return;
+      }
+
+      if (attempts >= 100) {
+
+        clearInterval(apiCheck);
+
+        console.error(
+          "YouTube Iframe API yüklenemedi."
+        );
+
+        if (progressElement) {
+
+          progressElement.textContent =
+            "YouTube oynatıcı başlatılamadı.";
+
+        }
+
+      }
+
+    }, 100);
+
+}
 
   function createPlayer() {
 
