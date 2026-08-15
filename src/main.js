@@ -2408,24 +2408,49 @@ if (progressFill) {
           Number(state.selectedVideo.id)
       }
     )
-    .then(({ data, error }) => {
+  .then(({ data, error }) => {
 
-      if (error) {
+  if (error) {
 
-        console.error(
-          "İzlenme kaydı hatası:",
-          error
-        );
+    console.error(
+      "İzlenme kaydı hatası:",
+      error
+    );
 
-        return;
-      }
+    if (progressElement) {
+      progressElement.textContent =
+        "⚠️ İzleme kaydedilemedi.";
+    }
 
-      console.log(
-        "İzlenme kaydı sonucu:",
-        data
-      );
+    return;
+  }
 
-    });
+  console.log(
+    "İzlenme kaydı sonucu:",
+    data
+  );
+
+  if (data === true) {
+
+    if (progressElement) {
+      progressElement.textContent =
+        "🎉 Tebrikler! +5 puan kazandın.";
+    }
+
+    if (progressFill) {
+      progressFill.style.width = "100%";
+    }
+
+  } else {
+
+    if (progressElement) {
+      progressElement.textContent =
+        "✅ Bu videoyu daha önce tamamladın.";
+    }
+
+  }
+
+});
 
 }
 
