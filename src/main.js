@@ -3,9 +3,11 @@ import "./style.css";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+
+const supabase =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
 
 const app = document.querySelector("#root");
 
@@ -13,13 +15,18 @@ const state = {
   view: "home",
   videos: [],
   categories: [],
-  user: null
+  user: null,
+  isAdmin: false
 };
 
 function youtubeId(url = "") {
   try {
     const u = new URL(url);
-    if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
+
+    if (u.hostname.includes("youtu.be")) {
+      return u.pathname.slice(1);
+    }
+
     return u.searchParams.get("v") || "";
   } catch {
     return "";
@@ -27,7 +34,7 @@ function youtubeId(url = "") {
 }
 
 function escapeHtml(value = "") {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
+  return String(value ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -37,252 +44,1164 @@ function escapeHtml(value = "") {
 }
 
 function videoCard(v) {
-  const thumb = v.thumbnail_url || `https://i.ytimg.com/vi/${v.youtube_id}/hqdefault.jpg`;
+  const thumb =
+    v.thumbnail_url ||
+    `https://i.ytimg.com/vi/${v.youtube_id}/hqdefault.jpg`;
+
   return `
     <article class="card">
       <img src="${escapeHtml(thumb)}" alt="" loading="lazy">
+
       <div class="card-body">
-        <span class="tag">${escapeHtml(v.categories?.name || "Diğer")}</span>
-        <h3>${escapeHtml(v.title)}</h3>
-        <p>${escapeHtml(v.profiles?.display_name || "İçerik üreticisi")}</p>
-        <a class="button" href="${escapeHtml(v.youtube_url)}" target="_blank" rel="noopener">YouTube'da İzle →</a>
+        <span class="tag">
+          ${escapeHtml(v.categories?.name || "Diğer")}
+        </span>
+
+        <h3>${escapeHtml(v.title || "Başlıksız video")}</h3>
+
+        <p>
+          ${escapeHtml(
+            v.profiles?.display_name ||
+            v.profiles?.username ||
+            "İçerik üreticisi"
+          )}
+        </p>
+
+        <a
+          class="button"
+          href="${escapeHtml(v.youtube_url)}"
+          target="_blank"
+          rel="noopener"
+        >
+          YouTube'da İzle →
+        </a>
       </div>
-    </article>`;
+    </article>
+  `;
+}
+
+function adminVideoCard(v) {
+  const thumb =
+    v.thumbnail_url ||
+    `https://i.ytimg.com/vi/${v.youtube_id}/hqdefault.jpg`;
+
+  const date = v.created_at
+    ? new Date(v.created_at).toLocaleString("tr-TR")
+    : "";
+
+  return `
+    <article class="card admin-card">
+      <img
+        src="${escapeHtml(thumb)}"
+        alt=""
+        loading="lazy"
+      >
+
+      <div class="card-body">
+
+        <span class="tag">
+          ${escapeHtml(v.status || "pending")}
+        </span>
+
+        <h3>
+          ${escapeHtml(v.title || "Başlıksız video")}
+        </h3>
+
+        <p>
+          <strong>Kullanıcı:</strong>
+          ${escapeHtml(
+            v.profiles?.display_name ||
+            v.profiles?.username ||
+            "Bilinmeyen kullanıcı"
+          )}
+        </p>
+
+        <p>
+          <strong>Kategori:</strong>
+          ${escapeHtml(v.categories?.name || "Diğer")}
+        </p>
+
+        <p>
+          <strong>Tarih:</strong>
+          ${escapeHtml(date)}
+        </p>
+
+        ${
+          v.description
+            ? `<p>${escapeHtml(v.description)}</p>`
+            : ""
+        }
+
+        <div class="admin-actions">
+
+          <a
+            class="button secondary"
+            href="${escapeHtml(v.youtube_url)}"
+            target="_blank"
+            rel="noopener"
+          >
+            YouTube'da Aç
+          </a>
+
+          <button
+            class="button primary approve-video"
+            data-id="${escapeHtml(v.id)}"
+          >
+            ✓ Onayla
+          </button>
+
+          <button
+            class="button danger reject-video"
+            data-id="${escapeHtml(v.id)}"
+          >
+            ✕ Reddet
+          </button>
+
+        </div>
+
+        <div
+          class="admin-message"
+          id="message-${escapeHtml(v.id)}"
+        ></div>
+
+      </div>
+    </article>
+  `;
 }
 
 async function loadData() {
   if (!supabase) return;
-  const { data: cats } = await supabase.from("categories").select("*").order("name");
-  const { data: vids } = await supabase
-    .from("videos")
-    .select("*, categories(name), profiles(display_name)")
-    .eq("status", "approved")
-    .order("created_at", { ascending: false });
+
+  const { data: cats, error: categoryError } =
+    await supabase
+      .from("categories")
+      .select("*")
+      .order("name");
+
+  if (categoryError) {
+    console.error(
+      "Category loading error:",
+      categoryError
+    );
+  }
+
   state.categories = cats || [];
-  state.videos = vids || [];
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
   state.user = user || null;
+  state.isAdmin = false;
+
+  if (state.user) {
+    const { data: profile, error: profileError } =
+      await supabase
+        .from("profiles")
+        .select("role, username, display_name")
+        .eq("id", state.user.id)
+        .maybeSingle();
+
+    if (profileError) {
+      console.error(
+        "Profile loading error:",
+        profileError
+      );
+    }
+
+    state.isAdmin = profile?.role === "admin";
+  }
+
+  let videoQuery = supabase
+    .from("videos")
+    .select(
+      "*, categories(name), profiles(display_name, username)"
+    )
+    .order("created_at", {
+      ascending: false
+    });
+
+  if (!state.isAdmin) {
+    videoQuery = videoQuery.eq(
+      "status",
+      "approved"
+    );
+  }
+
+  const { data: vids, error } =
+    await videoQuery;
+
+  if (error) {
+    console.error(
+      "Video loading error:",
+      error
+    );
+
+    state.videos = [];
+  } else {
+    state.videos = vids || [];
+  }
 }
 
 function render() {
   app.innerHTML = `
+
     <header class="header">
+
       <div class="container nav">
-        <button class="logo" data-view="home">Video<span>Keşfet</span></button>
+
+        <button
+          class="logo"
+          data-view="home"
+        >
+          Video<span>Keşfet</span>
+        </button>
+
         <nav>
-          <button data-view="home">Ana Sayfa</button>
-          <button data-view="discover">Keşfet</button>
-          <button data-view="submit">+ Video Ekle</button>
-          ${state.user
-            ? `<button data-view="profile">Profil</button><button id="logout">Çıkış</button>`
-            : `<button data-view="login">Giriş / Kayıt</button>`}
+
+          <button data-view="home">
+            Ana Sayfa
+          </button>
+
+          <button data-view="discover">
+            Keşfet
+          </button>
+
+          <button data-view="submit">
+            + Video Ekle
+          </button>
+
+          ${
+            state.isAdmin
+              ? `
+                <button data-view="admin">
+                  🛡️ Admin
+                </button>
+              `
+              : ""
+          }
+
+          ${
+            state.user
+              ? `
+                <button data-view="profile">
+                  Profil
+                </button>
+
+                <button id="logout">
+                  Çıkış
+                </button>
+              `
+              : `
+                <button data-view="login">
+                  Giriş / Kayıt
+                </button>
+              `
+          }
+
         </nav>
+
       </div>
+
     </header>
-    <main>${page()}</main>
-    <footer><div class="container">VideoKeşfet 1.0 · Yeni videolar keşfet, yeni kanallar bul.</div></footer>
+
+    <main>
+      ${page()}
+    </main>
+
+    <footer>
+
+      <div class="container">
+        VideoKeşfet 1.0 · Yeni videolar keşfet,
+        yeni kanallar bul.
+      </div>
+
+    </footer>
   `;
+
   bind();
 }
 
 function page() {
-  if (state.view === "discover") return discoverPage();
-  if (state.view === "submit") return submitPage();
-  if (state.view === "login") return loginPage();
-  if (state.view === "profile") return profilePage();
+
+  if (state.view === "discover") {
+    return discoverPage();
+  }
+
+  if (state.view === "submit") {
+    return submitPage();
+  }
+
+  if (state.view === "login") {
+    return loginPage();
+  }
+
+  if (state.view === "profile") {
+    return profilePage();
+  }
+
+  if (state.view === "admin") {
+    return adminPage();
+  }
+
   return homePage();
 }
 
 function homePage() {
-  const videos = state.videos.slice(0, 6);
+
+  const videos = state.videos
+    .filter(
+      (video) =>
+        video.status === "approved"
+    )
+    .slice(0, 6);
+
   return `
+
     <section class="hero">
+
       <div class="container">
-        <p class="eyebrow">YENİ İÇERİKLERİ KEŞFET</p>
-        <h1>İlgi alanına göre<br><span>yeni videolar bul.</span></h1>
-        <p class="lead">İçerik üreticilerini keşfet, kanalları incele ve gerçekten ilgini çeken videolara ulaş.</p>
+
+        <p class="eyebrow">
+          YENİ İÇERİKLERİ KEŞFET
+        </p>
+
+        <h1>
+          İlgi alanına göre<br>
+          <span>yeni videolar bul.</span>
+        </h1>
+
+        <p class="lead">
+          İçerik üreticilerini keşfet,
+          kanalları incele ve gerçekten ilgini
+          çeken videolara ulaş.
+        </p>
+
         <div class="hero-actions">
-          <button class="button primary" data-view="discover">Keşfetmeye Başla</button>
-          <button class="button secondary" data-view="submit">Videonu Ekle</button>
+
+          <button
+            class="button primary"
+            data-view="discover"
+          >
+            Keşfetmeye Başla
+          </button>
+
+          <button
+            class="button secondary"
+            data-view="submit"
+          >
+            Videonu Ekle
+          </button>
+
         </div>
+
       </div>
+
     </section>
+
     <section class="container section">
-      <div class="section-head"><h2>🔥 Yeni Videolar</h2><button data-view="discover" class="link">Tümünü gör →</button></div>
-      <div class="grid">${videos.length ? videos.map(videoCard).join("") : emptyState()}</div>
-    </section>`;
+
+      <div class="section-head">
+
+        <h2>
+          🔥 Yeni Videolar
+        </h2>
+
+        <button
+          data-view="discover"
+          class="link"
+        >
+          Tümünü gör →
+        </button>
+
+      </div>
+
+      <div class="grid">
+
+        ${
+          videos.length
+            ? videos.map(videoCard).join("")
+            : emptyState()
+        }
+
+      </div>
+
+    </section>
+  `;
 }
 
 function discoverPage() {
+
+  const approvedVideos =
+    state.videos.filter(
+      (video) =>
+        video.status === "approved"
+    );
+
   return `
-    <section class="container section page-top">
-      <p class="eyebrow">KEŞFET</p><h1>Yeni videolar bul.</h1>
+
+    <section
+      class="container section page-top"
+    >
+
+      <p class="eyebrow">
+        KEŞFET
+      </p>
+
+      <h1>
+        Yeni videolar bul.
+      </h1>
+
       <div class="filters">
-        <button class="filter active" data-category="all">Tümü</button>
-        ${state.categories.map(c => `<button class="filter" data-category="${escapeHtml(c.id)}">${escapeHtml(c.name)}</button>`).join("")}
+
+        <button
+          class="filter active"
+          data-category="all"
+        >
+          Tümü
+        </button>
+
+        ${
+          state.categories
+            .map(
+              (c) => `
+                <button
+                  class="filter"
+                  data-category="${escapeHtml(c.id)}"
+                >
+                  ${escapeHtml(c.name)}
+                </button>
+              `
+            )
+            .join("")
+        }
+
       </div>
-      <div id="discover-grid" class="grid">${state.videos.map(videoCard).join("") || emptyState()}</div>
-    </section>`;
+
+      <div
+        id="discover-grid"
+        class="grid"
+      >
+
+        ${
+          approvedVideos.length
+            ? approvedVideos
+                .map(videoCard)
+                .join("")
+            : emptyState()
+        }
+
+      </div>
+
+    </section>
+  `;
 }
 
 function submitPage() {
-  if (!state.user) return loginRequired("Video eklemek için giriş yapmalısın.");
+
+  if (!state.user) {
+    return loginRequired(
+      "Video eklemek için giriş yapmalısın."
+    );
+  }
+
   return `
-    <section class="container narrow page-top">
-      <p class="eyebrow">İÇERİK ÜRETİCİSİ</p><h1>Videonu ekle.</h1>
-      <p class="lead">YouTube videonu VideoKeşfet'e gönder. İlk sürümde gönderiler moderasyondan geçer.</p>
-      <form id="video-form" class="form">
-        <label>YouTube bağlantısı<input name="url" required placeholder="https://youtube.com/watch?v=..." /></label>
-        <label>Video başlığı<input name="title" required placeholder="Video başlığı" /></label>
-        <label>Kategori<select name="category" required>
-          <option value="">Seç...</option>
-          ${state.categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("")}
-        </select></label>
-        <label>Kısa açıklama<textarea name="description" rows="5" placeholder="Videonu kısaca anlat..."></textarea></label>
-        <button class="button primary" type="submit">Videoyu Gönder</button>
+
+    <section
+      class="container narrow page-top"
+    >
+
+      <p class="eyebrow">
+        İÇERİK ÜRETİCİSİ
+      </p>
+
+      <h1>
+        Videonu ekle.
+      </h1>
+
+      <p class="lead">
+        YouTube videonu VideoKeşfet'e gönder.
+        İlk sürümde gönderiler moderasyondan geçer.
+      </p>
+
+      <form
+        id="video-form"
+        class="form"
+      >
+
+        <label>
+          YouTube bağlantısı
+
+          <input
+            name="url"
+            required
+            placeholder="https://youtube.com/watch?v=..."
+          />
+        </label>
+
+        <label>
+          Video başlığı
+
+          <input
+            name="title"
+            required
+            placeholder="Video başlığı"
+          />
+        </label>
+
+        <label>
+          Kategori
+
+          <select
+            name="category"
+            required
+          >
+
+            <option value="">
+              Seç...
+            </option>
+
+            ${
+              state.categories
+                .map(
+                  (c) => `
+                    <option
+                      value="${escapeHtml(c.id)}"
+                    >
+                      ${escapeHtml(c.name)}
+                    </option>
+                  `
+                )
+                .join("")
+            }
+
+          </select>
+
+        </label>
+
+        <label>
+          Kısa açıklama
+
+          <textarea
+            name="description"
+            rows="5"
+            placeholder="Videonu kısaca anlat..."
+          ></textarea>
+        </label>
+
+        <button
+          class="button primary"
+          type="submit"
+        >
+          Videoyu Gönder
+        </button>
+
         <div id="form-message"></div>
+
       </form>
-    </section>`;
+
+    </section>
+  `;
 }
 
 function loginPage() {
-  if (!supabase) return `<section class="container narrow page-top"><div class="notice">Supabase bağlantısı henüz yapılandırılmadı. <code>.env</code> dosyasını oluştur.</div></section>`;
+
+  if (!supabase) {
+
+    return `
+      <section
+        class="container narrow page-top"
+      >
+
+        <div class="notice">
+          Supabase bağlantısı henüz yapılandırılmadı.
+        </div>
+
+      </section>
+    `;
+  }
+
   return `
-    <section class="container narrow page-top">
-      <p class="eyebrow">HESABIN</p><h1>Giriş yap veya kayıt ol.</h1>
-      <form id="auth-form" class="form">
-        <label>E-posta<input name="email" type="email" required /></label>
-        <label>Şifre<input name="password" type="password" minlength="6" required /></label>
-        <button class="button primary" name="action" value="login">Giriş Yap</button>
-        <button class="button secondary" name="action" value="signup">Hesap Oluştur</button>
+
+    <section
+      class="container narrow page-top"
+    >
+
+      <p class="eyebrow">
+        HESABIN
+      </p>
+
+      <h1>
+        Giriş yap veya kayıt ol.
+      </h1>
+
+      <form
+        id="auth-form"
+        class="form"
+      >
+
+        <label>
+          E-posta
+
+          <input
+            name="email"
+            type="email"
+            required
+          />
+        </label>
+
+        <label>
+          Şifre
+
+          <input
+            name="password"
+            type="password"
+            minlength="6"
+            required
+          />
+        </label>
+
+        <button
+          class="button primary"
+          name="action"
+          value="login"
+        >
+          Giriş Yap
+        </button>
+
+        <button
+          class="button secondary"
+          name="action"
+          value="signup"
+        >
+          Hesap Oluştur
+        </button>
+
         <div id="auth-message"></div>
+
       </form>
-    </section>`;
+
+    </section>
+  `;
 }
 
 function profilePage() {
+
   return `
-    <section class="container narrow page-top">
-      <p class="eyebrow">PROFİL</p><h1>${escapeHtml(state.user?.email || "")}</h1>
-      <div class="profile-stat"><strong>0</strong><span>Puan</span></div>
-      <p>Profil ve puan sistemi bir sonraki sürümde genişletilecek.</p>
-    </section>`;
+
+    <section
+      class="container narrow page-top"
+    >
+
+      <p class="eyebrow">
+        PROFİL
+      </p>
+
+      <h1>
+        ${escapeHtml(
+          state.user?.email || ""
+        )}
+      </h1>
+
+      <div class="profile-stat">
+        <strong>0</strong>
+        <span>Puan</span>
+      </div>
+
+      <p>
+        Profil ve puan sistemi bir sonraki
+        sürümde genişletilecek.
+      </p>
+
+      ${
+        state.isAdmin
+          ? `
+            <div class="notice">
+              Bu hesap yönetici hesabıdır.
+            </div>
+          `
+          : ""
+      }
+
+    </section>
+  `;
+}
+
+function adminPage() {
+
+  if (!state.user) {
+    return loginRequired(
+      "Admin paneline girmek için giriş yapmalısın."
+    );
+  }
+
+  if (!state.isAdmin) {
+
+    return `
+      <section
+        class="container narrow page-top"
+      >
+
+        <div class="notice">
+          Bu sayfaya erişim yetkin yok.
+        </div>
+
+      </section>
+    `;
+  }
+
+  const pendingVideos =
+    state.videos.filter(
+      (video) =>
+        video.status === "pending"
+    );
+
+  return `
+
+    <section
+      class="container section page-top"
+    >
+
+      <p class="eyebrow">
+        YÖNETİM
+      </p>
+
+      <h1>
+        Admin Paneli
+      </h1>
+
+      <p class="lead">
+        Bekleyen videoları incele ve yayın
+        durumlarını yönet.
+      </p>
+
+      <div class="section-head">
+
+        <h2>
+          Bekleyen Videolar
+          (${pendingVideos.length})
+        </h2>
+
+      </div>
+
+      <div
+        id="admin-grid"
+        class="grid"
+      >
+
+        ${
+          pendingVideos.length
+            ? pendingVideos
+                .map(adminVideoCard)
+                .join("")
+            : `
+              <div class="empty">
+                Bekleyen video yok.
+              </div>
+            `
+        }
+
+      </div>
+
+    </section>
+  `;
 }
 
 function loginRequired(message) {
-  return `<section class="container narrow page-top"><div class="notice">${message}<br><button class="button primary" data-view="login">Giriş / Kayıt</button></div></section>`;
+
+  return `
+
+    <section
+      class="container narrow page-top"
+    >
+
+      <div class="notice">
+
+        ${escapeHtml(message)}
+
+        <br><br>
+
+        <button
+          class="button primary"
+          data-view="login"
+        >
+          Giriş / Kayıt
+        </button>
+
+      </div>
+
+    </section>
+  `;
 }
+
 function emptyState() {
-  return `<div class="empty">Henüz onaylanmış video yok. İlk videoyu sen ekleyebilirsin.</div>`;
+
+  return `
+    <div class="empty">
+      Henüz onaylanmış video yok.
+      İlk videoyu sen ekleyebilirsin.
+    </div>
+  `;
+}
+
+async function refreshAndRender(
+  view = state.view
+) {
+
+  await loadData();
+
+  state.view = view;
+
+  render();
 }
 
 function bind() {
-  // Sayfa yönlendirmeleri
-  document.querySelectorAll("[data-view]").forEach(button => {
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      const targetView = button.getAttribute("data-view");
 
-      if (!targetView) return;
+  document
+    .querySelectorAll("[data-view]")
+    .forEach((button) => {
 
-      state.view = targetView;
-      render();
+      button.addEventListener(
+        "click",
+        async (event) => {
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-    });
-  });
+          event.preventDefault();
 
-  // Çıkış
-  document.querySelector("#logout")?.addEventListener("click", async () => {
-    await supabase.auth.signOut();
-    state.user = null;
-    state.view = "home";
-    render();
-  });
-
-  // Kategori filtreleri
-  document.querySelectorAll("[data-category]").forEach(button => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".filter").forEach(filter => {
-        filter.classList.remove("active");
-      });
-
-      button.classList.add("active");
-
-      const id = button.dataset.category;
-
-      const list =
-        id === "all"
-          ? state.videos
-          : state.videos.filter(
-              video => String(video.category_id) === id
+          const targetView =
+            button.getAttribute(
+              "data-view"
             );
 
-      const grid = document.querySelector("#discover-grid");
+          if (!targetView) return;
 
-      if (grid) {
-        grid.innerHTML =
-          list.map(videoCard).join("") || emptyState();
+          state.view = targetView;
+
+          render();
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
+        }
+      );
+
+    });
+
+  document
+    .querySelector("#logout")
+    ?.addEventListener(
+      "click",
+      async () => {
+
+        if (!supabase) return;
+
+        await supabase.auth.signOut();
+
+        state.user = null;
+        state.isAdmin = false;
+        state.view = "home";
+        state.videos = [];
+
+        await loadData();
+
+        render();
       }
+    );
+
+  document
+    .querySelectorAll("[data-category]")
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(".filter")
+            .forEach((filter) => {
+              filter.classList.remove(
+                "active"
+              );
+            });
+
+          button.classList.add(
+            "active"
+          );
+
+          const id =
+            button.dataset.category;
+
+          const approvedVideos =
+            state.videos.filter(
+              (video) =>
+                video.status === "approved"
+            );
+
+          const list =
+            id === "all"
+              ? approvedVideos
+              : approvedVideos.filter(
+                  (video) =>
+                    String(
+                      video.category_id
+                    ) === id
+                );
+
+          const grid =
+            document.querySelector(
+              "#discover-grid"
+            );
+
+          if (grid) {
+
+            grid.innerHTML =
+              list
+                .map(videoCard)
+                .join("") ||
+              emptyState();
+
+          }
+
+        }
+      );
+
     });
-  });
 
-  // Giriş / kayıt
-  document.querySelector("#auth-form")?.addEventListener("submit", async event => {
-    event.preventDefault();
+  document
+    .querySelector("#auth-form")
+    ?.addEventListener(
+      "submit",
+      async (event) => {
 
-    const form = new FormData(event.target);
-    const action = form.get("action");
-    const email = form.get("email");
-    const password = form.get("password");
-    const message = document.querySelector("#auth-message");
+        event.preventDefault();
 
-    const result =
-      action === "signup"
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password });
+        if (!supabase) return;
 
-    if (result.error) {
-      message.textContent = result.error.message;
-    } else {
-      await loadData();
-      state.view = "home";
-      render();
-    }
-  });
+        const form =
+          new FormData(event.target);
 
-  // Video ekleme
-  document.querySelector("#video-form")?.addEventListener("submit", async event => {
-    event.preventDefault();
+        const action =
+          form.get("action");
 
-    const form = new FormData(event.target);
-    const id = youtubeId(form.get("url"));
-    const message = document.querySelector("#form-message");
+        const email =
+          form.get("email");
 
-    const { error } = await supabase.from("videos").insert({
-      user_id: state.user.id,
-      youtube_url: form.get("url"),
-      youtube_id: id,
-      title: form.get("title"),
-      description: form.get("description"),
-      category_id: Number(form.get("category")),
-      status: "pending"
+        const password =
+          form.get("password");
+
+        const message =
+          document.querySelector(
+            "#auth-message"
+          );
+
+        message.textContent =
+          "İşleniyor...";
+
+        const result =
+          action === "signup"
+            ? await supabase.auth.signUp({
+                email,
+                password
+              })
+            : await supabase.auth.signInWithPassword({
+                email,
+                password
+              });
+
+        if (result.error) {
+
+          message.textContent =
+            result.error.message;
+
+          return;
+        }
+
+        await loadData();
+
+        state.view = "home";
+
+        render();
+      }
+    );
+
+  document
+    .querySelector("#video-form")
+    ?.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        if (
+          !supabase ||
+          !state.user
+        ) {
+          return;
+        }
+
+        const form =
+          new FormData(event.target);
+
+        const url =
+          form.get("url");
+
+        const title =
+          form.get("title");
+
+        const category =
+          form.get("category");
+
+        const description =
+          form.get("description");
+
+        const id =
+          youtubeId(url);
+
+        const message =
+          document.querySelector(
+            "#form-message"
+          );
+
+        message.textContent =
+          "Gönderiliyor...";
+
+        const { error } =
+          await supabase
+            .from("videos")
+            .insert({
+              user_id:
+                state.user.id,
+
+              youtube_url:
+                url,
+
+              youtube_id:
+                id,
+
+              title:
+                title,
+
+              description:
+                description,
+
+              category_id:
+                Number(category),
+
+              status:
+                "pending"
+            });
+
+        if (error) {
+
+          message.textContent =
+            error.message;
+
+          return;
+        }
+
+        event.target.reset();
+
+        message.textContent =
+          "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".approve-video"
+    )
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          await updateVideoStatus(
+            button.dataset.id,
+            "approved"
+          );
+
+        }
+      );
+
     });
 
-    if (error) {
-      message.textContent = error.message;
-    } else {
-      event.target.reset();
+  document
+    .querySelectorAll(
+      ".reject-video"
+    )
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          await updateVideoStatus(
+            button.dataset.id,
+            "rejected"
+          );
+
+        }
+      );
+
+    });
+}
+
+async function updateVideoStatus(
+  videoId,
+  status
+) {
+
+  if (
+    !supabase ||
+    !state.isAdmin
+  ) {
+    return;
+  }
+
+  const message =
+    document.querySelector(
+      `#message-${videoId}`
+    );
+
+  if (message) {
+    message.textContent =
+      "Güncelleniyor...";
+  }
+
+  const { error } =
+    await supabase
+      .from("videos")
+      .update({
+        status
+      })
+      .eq("id", videoId);
+
+  if (error) {
+
+    console.error(
+      "Video status update error:",
+      error
+    );
+
+    if (message) {
       message.textContent =
-        "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
+        `İşlem başarısız: ${error.message}`;
     }
-  });
+
+    return;
+  }
+
+  await refreshAndRender(
+    "admin"
+  );
 }
 
 (async () => {
+
   await loadData();
+
   render();
+
 })();
