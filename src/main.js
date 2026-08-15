@@ -1506,67 +1506,89 @@ function bind() {
       }
     );
 
+// ARAMA + KATEGORİ FİLTRELEME
+
+function applyDiscoverFilters() {
+
+  const searchInput =
+    document.querySelector("#video-search");
+
+  const search =
+    searchInput?.value
+      .trim()
+      .toLocaleLowerCase("tr-TR") || "";
+
+  const category =
+    state.selectedCategory || "all";
+
+  const approvedVideos =
+    state.videos.filter(
+      (video) =>
+        video.status === "approved"
+    );
+
+  const list =
+    approvedVideos.filter((video) => {
+
+      const categoryMatch =
+        category === "all" ||
+        String(video.category_id) ===
+          String(category);
+
+      const title =
+        String(
+          video.title || ""
+        ).toLocaleLowerCase("tr-TR");
+
+      const creator =
+        String(
+          video.profiles?.display_name ||
+          video.profiles?.username ||
+          ""
+        ).toLocaleLowerCase("tr-TR");
+
+      const description =
+        String(
+          video.description || ""
+        ).toLocaleLowerCase("tr-TR");
+
+      const searchMatch =
+        !search ||
+        title.includes(search) ||
+        creator.includes(search) ||
+        description.includes(search);
+
+      return (
+        categoryMatch &&
+        searchMatch
+      );
+    });
+
+  const grid =
+    document.querySelector(
+      "#discover-grid"
+    );
+
+  if (grid) {
+    grid.innerHTML =
+      list
+        .map(videoCard)
+        .join("") ||
+      `
+        <div class="empty">
+          Aramanızla eşleşen video bulunamadı.
+        </div>
+      `;
+  }
+}
+
+
 document
   .querySelector("#video-search")
-  ?.addEventListener("input", (event) => {
-
-    const search =
-      event.target.value
-        .trim()
-        .toLocaleLowerCase("tr-TR");
-
-    const approvedVideos =
-      state.videos.filter(
-        (video) =>
-          video.status === "approved"
-      );
-
-    const list =
-      approvedVideos.filter((video) => {
-
-        const title =
-          String(
-            video.title || ""
-          ).toLocaleLowerCase("tr-TR");
-
-        const creator =
-          String(
-            video.profiles?.display_name ||
-            video.profiles?.username ||
-            ""
-          ).toLocaleLowerCase("tr-TR");
-
-        const description =
-          String(
-            video.description || ""
-          ).toLocaleLowerCase("tr-TR");
-
-        return (
-          !search ||
-          title.includes(search) ||
-          creator.includes(search) ||
-          description.includes(search)
-        );
-      });
-
-    const grid =
-      document.querySelector(
-        "#discover-grid"
-      );
-
-    if (grid) {
-      grid.innerHTML =
-        list
-          .map(videoCard)
-          .join("") ||
-        `
-          <div class="empty">
-            Aramanızla eşleşen video bulunamadı.
-          </div>
-        `;
-    }
-
-  });
+  ?.addEventListener(
+    "input",
+    applyDiscoverFilters
+  );
   document
     .querySelectorAll("[data-category]")
     .forEach((button) => {
@@ -1589,7 +1611,7 @@ document
 
           const id =
             button.dataset.category;
-
+state.selectedCategory = id;
           const approvedVideos =
             state.videos.filter(
               (video) =>
