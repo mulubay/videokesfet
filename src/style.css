@@ -188,3 +188,188 @@
   font-size: 13px;
   font-weight: 600;
 }
+/* =========================================
+   VIDEO KARTLARI - MODERN TASARIM
+   ========================================= */
+
+.card {
+  overflow: hidden;
+  border-radius: 16px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.10);
+}
+
+.video-card-thumb {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f1f1f1;
+}
+
+.video-card-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .video-card-thumb img {
+  transform: scale(1.03);
+}
+
+.video-type-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  padding: 5px 9px;
+
+  border-radius: 7px;
+
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+
+  backdrop-filter: blur(4px);
+}
+
+.card-body {
+  padding: 15px 16px 17px;
+}
+
+.video-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  margin-bottom: 9px;
+}
+
+.points-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: #eaf7ed;
+  color: #237a3b;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.video-owner-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: #f1f1f1;
+  color: #666;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.card-body h3 {
+  margin: 0;
+
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 700;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-body p {
+  margin: 7px 0 0;
+
+  color: #777;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.watch-reward {
+  display: block;
+
+  margin-top: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  opacity: 0.8;
+}
+
+.video-card-button {
+  display: block;
+
+  width: 100%;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.video-card-button .button {
+  display: inline-flex;
+  margin-top: 14px;
+}
+
+.my-video-card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.my-video-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.10);
+}
+
+.my-video-card .video-card-thumb {
+  border-radius: 14px;
+}
+
+.my-video-card .video-card-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.my-video-card .video-card-meta {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
