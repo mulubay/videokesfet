@@ -50,32 +50,43 @@ function videoCard(v) {
 
   return `
     <article class="card">
-      <img src="${escapeHtml(thumb)}" alt="" loading="lazy">
 
-      <div class="card-body">
-        <span class="tag">
-          ${escapeHtml(v.categories?.name || "Diğer")}
-        </span>
-
-        <h3>${escapeHtml(v.title || "Başlıksız video")}</h3>
-
-        <p>
-          ${escapeHtml(
-            v.profiles?.display_name ||
-            v.profiles?.username ||
-            "İçerik üreticisi"
-          )}
-        </p>
-
-        <a
-          class="button"
-          href="${escapeHtml(v.youtube_url)}"
-          target="_blank"
-          rel="noopener"
+      <button
+        class="video-card-button"
+        data-video-id="${escapeHtml(v.youtube_id)}"
+        data-video-title="${escapeHtml(v.title || "Video")}"
+      >
+        <img
+          src="${escapeHtml(thumb)}"
+          alt=""
+          loading="lazy"
         >
-          YouTube'da İzle →
-        </a>
-      </div>
+
+        <div class="card-body">
+
+          <span class="tag">
+            ${escapeHtml(v.categories?.name || "Diğer")}
+          </span>
+
+          <h3>
+            ${escapeHtml(v.title || "Başlıksız video")}
+          </h3>
+
+          <p>
+            ${escapeHtml(
+              v.profiles?.display_name ||
+              v.profiles?.username ||
+              "İçerik üreticisi"
+            )}
+          </p>
+
+          <span class="button">
+            ▶ Videoyu İzle
+          </span>
+
+        </div>
+      </button>
+
     </article>
   `;
 }
