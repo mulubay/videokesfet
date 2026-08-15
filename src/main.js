@@ -1658,7 +1658,6 @@ if (profileForm) {
     
 console.log("URL:", url);
 console.log("YOUTUBE ID:", id);
-);
 
         const message =
           document.querySelector(
