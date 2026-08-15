@@ -1831,13 +1831,20 @@ function initYouTubePlayer() {
       return;
     }
 
+  if (progressElement) {
+
+  progressElement.textContent =
+    `🔒 YouTube bağlantısı için ${Math.ceil(
+      remaining
+    )} saniye daha izle.`;
+
+}
     if (progressElement) {
 
-      progressElement.textContent =
-        `YouTube bağlantısının açılmasına ${Math.ceil(
-          remaining
-        )} saniye kaldı.`;
-    }
+  progressElement.textContent =
+    "🔓 YouTube bağlantısı artık açılabilir.";
+
+}
   }
 
   function createPlayer() {
