@@ -173,55 +173,107 @@ function emptyState() {
 }
 
 function bind() {
-  document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => { state.view = b.dataset.view; render(); });
+  // Sayfa yönlendirmeleri
+  document.querySelectorAll("[data-view]").forEach(button => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      const targetView = button.getAttribute("data-view");
+
+      if (!targetView) return;
+
+      state.view = targetView;
+      render();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    });
+  });
+
+  // Çıkış
   document.querySelector("#logout")?.addEventListener("click", async () => {
     await supabase.auth.signOut();
-    state.user = null; state.view = "home"; render();
+    state.user = null;
+    state.view = "home";
+    render();
   });
 
-  document.querySelectorAll("[data-category]").forEach(b => b.onclick = () => {
-    document.querySelectorAll(".filter").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    const id = b.dataset.category;
-    const list = id === "all" ? state.videos : state.videos.filter(v => String(v.category_id) === id);
-    document.querySelector("#discover-grid").innerHTML = list.map(videoCard).join("") || emptyState();
+  // Kategori filtreleri
+  document.querySelectorAll("[data-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".filter").forEach(filter => {
+        filter.classList.remove("active");
+      });
+
+      button.classList.add("active");
+
+      const id = button.dataset.category;
+
+      const list =
+        id === "all"
+          ? state.videos
+          : state.videos.filter(
+              video => String(video.category_id) === id
+            );
+
+      const grid = document.querySelector("#discover-grid");
+
+      if (grid) {
+        grid.innerHTML =
+          list.map(videoCard).join("") || emptyState();
+      }
+    });
   });
 
-  document.querySelector("#auth-form")?.addEventListener("submit", async e => {
-    e.preventDefault();
-    const f = new FormData(e.target);
-    const action = f.get("action");
-    const email = f.get("email"), password = f.get("password");
-    const box = document.querySelector("#auth-message");
-    const result = action === "signup"
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
-    if (result.error) box.textContent = result.error.message;
-    else {
+  // Giriş / kayıt
+  document.querySelector("#auth-form")?.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const form = new FormData(event.target);
+    const action = form.get("action");
+    const email = form.get("email");
+    const password = form.get("password");
+    const message = document.querySelector("#auth-message");
+
+    const result =
+      action === "signup"
+        ? await supabase.auth.signUp({ email, password })
+        : await supabase.auth.signInWithPassword({ email, password });
+
+    if (result.error) {
+      message.textContent = result.error.message;
+    } else {
       await loadData();
       state.view = "home";
       render();
     }
   });
 
-  document.querySelector("#video-form")?.addEventListener("submit", async e => {
-    e.preventDefault();
-    const f = new FormData(e.target);
-    const id = youtubeId(f.get("url"));
-    const box = document.querySelector("#form-message");
+  // Video ekleme
+  document.querySelector("#video-form")?.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const form = new FormData(event.target);
+    const id = youtubeId(form.get("url"));
+    const message = document.querySelector("#form-message");
+
     const { error } = await supabase.from("videos").insert({
       user_id: state.user.id,
-      youtube_url: f.get("url"),
+      youtube_url: form.get("url"),
       youtube_id: id,
-      title: f.get("title"),
-      description: f.get("description"),
-      category_id: Number(f.get("category")),
+      title: form.get("title"),
+      description: form.get("description"),
+      category_id: Number(form.get("category")),
       status: "pending"
     });
-    if (error) box.textContent = error.message;
-    else {
-      e.target.reset();
-      box.textContent = "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
+
+    if (error) {
+      message.textContent = error.message;
+    } else {
+      event.target.reset();
+      message.textContent =
+        "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
     }
   });
 }
