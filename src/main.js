@@ -1755,11 +1755,6 @@ if (
   }
 }
 
-await loadData();
-
-state.view = "home";
-
-render();
         await loadData();
 
         state.view =
