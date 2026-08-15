@@ -1299,50 +1299,79 @@ function loginPage() {
                     video.status || "pending";
 
                   return `
-                    <article class="card">
+                    <article class="card my-video-card">
 
-                      ${
-                        video.thumbnail_url
-                          ? `
-                            <img
-                              src="${escapeHtml(
-                                video.thumbnail_url
-                              )}"
-                              alt=""
-                              loading="lazy"
-                            >
-                          `
-                          : ""
-                      }
+  <div class="video-card-thumb">
 
-                      <div class="card-body">
+    ${
+      video.thumbnail_url
+        ? `
+          <img
+            src="${escapeHtml(
+              video.thumbnail_url
+            )}"
+            alt=""
+            loading="lazy"
+          >
+        `
+        : `
+          <div class="video-thumb-placeholder">
+            Video
+          </div>
+        `
+    }
 
-                        <span class="tag">
-                          ${escapeHtml(status)}
-                        </span>
+  </div>
 
-                        <h3>
-                          ${escapeHtml(
-                            video.title ||
-                            "Başlıksız video"
-                          )}
-                        </h3>
+  <div class="card-body">
 
-                        ${
-                          video.categories?.name
-                            ? `
-                              <p>
-                                ${escapeHtml(
-                                  video.categories.name
-                                )}
-                              </p>
-                            `
-                            : ""
-                        }
+    <div class="video-card-meta">
 
-                      </div>
+      <span class="tag">
+        ${escapeHtml(status)}
+      </span>
 
-                    </article>
+      ${
+        video.categories?.name
+          ? `
+            <span class="tag">
+              ${escapeHtml(
+                video.categories.name
+              )}
+            </span>
+          `
+          : ""
+      }
+
+    </div>
+
+    <h3>
+      ${escapeHtml(
+        video.title ||
+        "Başlıksız video"
+      )}
+    </h3>
+
+    ${
+      video.youtube_url
+        ? `
+          <a
+            class="button secondary"
+            href="${escapeHtml(
+              video.youtube_url
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ▶ YouTube'da Aç
+          </a>
+        `
+        : ""
+    }
+
+  </div>
+
+</article>
                   `;
                 })
                 .join("")}
