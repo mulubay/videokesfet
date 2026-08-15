@@ -1014,7 +1014,67 @@ function loginPage() {
         </form>
 
       </div>
+<div class="profile-edit-card">
 
+  <div class="section-head">
+    <h2>🎁 Arkadaşlarını Davet Et</h2>
+  </div>
+
+  <p class="muted">
+    Arkadaşını davet et, ikiniz de puan kazanın.
+  </p>
+
+  <div class="referral-rewards">
+
+    <div>
+      <strong>+20</strong>
+      <span>Sen kazanırsın</span>
+    </div>
+
+    <div>
+      <strong>+40</strong>
+      <span>Arkadaşın kazanır</span>
+    </div>
+
+  </div>
+
+  <div class="referral-box">
+
+    <p class="muted">
+      Davet kodun
+    </p>
+
+    <strong
+      id="referral-code"
+      class="referral-code"
+    >
+      Yükleniyor...
+    </strong>
+
+    <button
+      id="copy-referral-link"
+      class="button primary"
+      type="button"
+      disabled
+    >
+      🔗 Davet Linkini Kopyala
+    </button>
+
+    <div
+      id="referral-message"
+      class="form-message"
+    ></div>
+
+  </div>
+
+  <p
+    id="referral-count"
+    class="muted"
+  >
+    Başarılı davetlerin: yükleniyor...
+  </p>
+
+</div>
       <div class="section-head">
         <h2>Puan Geçmişi</h2>
       </div>
