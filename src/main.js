@@ -35,6 +35,11 @@ function escapeHtml(value = "") {
   }[c]));
 }
 function youtubeId(url = "") {
+  console.log(
+    "YOUTUBE ID FONKSİYONU ÇALIŞTI:",
+    url
+  );
+  
   try {
     const u = new URL(url);
 
@@ -76,12 +81,7 @@ function youtubeId(url = "") {
   } catch {
     return "";
   }
-  console.log(
-  "YOUTUBE ID TEST:",
-  youtubeId(
-    "https://youtube.com/shorts/KuU7aKBcaHE?si=test"
-  )
-);
+
 }
 
 function videoCard(v) {
