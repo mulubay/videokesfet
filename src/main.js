@@ -1685,7 +1685,40 @@ document
     );
 
   });
+// VİDEO TÜRÜ FİLTRESİ
 
+document
+  .querySelectorAll("[data-video-type]")
+  .forEach((button) => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(
+            ".video-type-filter"
+          )
+          .forEach((filter) => {
+            filter.classList.remove(
+              "active"
+            );
+          });
+
+        button.classList.add(
+          "active"
+        );
+
+        state.selectedVideoType =
+          button.dataset.videoType;
+
+        applyDiscoverFilters();
+
+      }
+    );
+
+  });
+  
   bindVideoCards();
 
 
