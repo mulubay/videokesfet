@@ -1655,6 +1655,10 @@ if (profileForm) {
 
         const id =
           youtubeId(url);
+        console.log(
+  "ÇIKAN YOUTUBE ID:",
+  id
+);
 
         const message =
           document.querySelector(
