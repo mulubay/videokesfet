@@ -1770,6 +1770,36 @@ function initYouTubePlayer() {
   if (remaining <= 0) {
 
     unlocked = true;
+    if (state.user) {
+
+  supabase
+    .rpc(
+      "complete_video_view",
+      {
+        p_video_id:
+          Number(state.selectedVideo.id)
+      }
+    )
+    .then(({ data, error }) => {
+
+      if (error) {
+
+        console.error(
+          "İzlenme kaydı hatası:",
+          error
+        );
+
+        return;
+      }
+
+      console.log(
+        "İzlenme kaydı sonucu:",
+        data
+      );
+
+    });
+
+}
 
     if (externalLink) {
 
