@@ -875,7 +875,56 @@ function profilePage() {
         <strong>${points}</strong>
         <span>Puan</span>
       </div>
+<div class="section-head">
+  <h2>Puan Geçmişi</h2>
+</div>
 
+<div class="point-history">
+  ${
+    state.pointTransactions.length
+      ? state.pointTransactions
+          .map((transaction) => {
+            const amount =
+              Number(transaction.amount);
+
+            const sign =
+              amount > 0 ? "+" : "";
+
+            const date =
+              new Date(
+                transaction.created_at
+              ).toLocaleString("tr-TR");
+
+            return `
+              <div class="point-history-item">
+
+                <div>
+                  <strong>
+                    ${escapeHtml(
+                      transaction.reason
+                    )}
+                  </strong>
+
+                  <small>
+                    ${escapeHtml(date)}
+                  </small>
+                </div>
+
+                <span class="point-amount">
+                  ${sign}${amount} puan
+                </span>
+
+              </div>
+            `;
+          })
+          .join("")
+      : `
+        <div class="empty">
+          Henüz puan hareketi yok.
+        </div>
+      `
+  }
+</div>
       ${
         state.isAdmin
           ? `
