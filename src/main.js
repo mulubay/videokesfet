@@ -623,7 +623,30 @@ function discoverPage() {
         }
 
       </div>
+<div class="filters video-type-filters">
 
+  <button
+    class="filter video-type-filter active"
+    data-video-type="all"
+  >
+    Tümü
+  </button>
+
+  <button
+    class="filter video-type-filter"
+    data-video-type="video"
+  >
+    🎬 Videolar
+  </button>
+
+  <button
+    class="filter video-type-filter"
+    data-video-type="shorts"
+  >
+    📱 Shorts
+  </button>
+
+</div>
       <div
         id="discover-grid"
         class="grid"
