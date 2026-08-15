@@ -46,7 +46,38 @@
 .video-card-button .button {
   display: inline-block;
 }
+.point-history {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 40px;
+}
 
+.point-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 18px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.point-history-item strong {
+  display: block;
+  font-size: 15px;
+}
+
+.point-history-item small {
+  display: block;
+  margin-top: 5px;
+  color: #777;
+}
+
+.point-amount {
+  font-weight: 700;
+  white-space: nowrap;
+}
 .video-player + .tag {
   display: inline-block;
   margin-top: 10px;
