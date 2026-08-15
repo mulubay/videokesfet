@@ -1818,27 +1818,6 @@ function initYouTubePlayer() {
 
 }
 
-      if (progressElement) {
-
-        progressElement.textContent =
-          "🔓 YouTube bağlantısı artık açılabilir.";
-
-      }
-
-      stopTracking();
-
-      return;
-    }
-
-    if (progressElement) {
-
-      progressElement.textContent =
-        `🔒 YouTube bağlantısı için ${remaining} saniye daha izle.`;
-
-    }
-
-  }
-
   function startTracking() {
 
     if (interval || unlocked) return;
