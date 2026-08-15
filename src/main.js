@@ -1702,12 +1702,6 @@ const result =
           return;
 
         }
-if (result.error) {
-  message.textContent =
-    result.error.message;
-
-  return;
-}
 
 console.log(
   "REFERRAL BLOĞUNA GELDİ",
