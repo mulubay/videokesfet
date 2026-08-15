@@ -103,7 +103,20 @@
   display: block;
   margin-bottom: 18px;
 }
+/* KEŞFET ARAMA KUTUSU */
 
+.discover-search {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+#video-search {
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 18px;
+  font-size: 17px;
+  box-sizing: border-box;
+}
 #profile-form small {
   display: block;
   margin-top: 6px;
