@@ -1266,7 +1266,44 @@ function emptyState() {
 async function refreshAndRender(
   view = state.view
 ) {
+if (
+  action === "signup" &&
+  result.data?.user
+) {
+  const referralCode =
+    localStorage.getItem(
+      "referral_code"
+    );
 
+  if (referralCode) {
+    const { data: referralResult, error: referralError } =
+      await supabase.rpc(
+        "register_referral",
+        {
+          p_code: referralCode
+        }
+      );
+
+    console.log(
+      "Davet sonucu:",
+      referralResult,
+      referralError
+    );
+
+    if (
+      referralResult === true &&
+      !referralError
+    ) {
+      localStorage.removeItem(
+        "referral_code"
+      );
+
+      console.log(
+        "Davet başarıyla işlendi."
+      );
+    }
+  }
+}
   await loadData();
 
   state.view = view;
