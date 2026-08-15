@@ -267,7 +267,9 @@ async function loadData() {
     const { data: profile, error: profileError } =
       await supabase
         .from("profiles")
-        .select("role, username, display_name, points")
+       .select(
+  "role, username, display_name, points, youtube_channel_url"
+)
         .eq("id", state.user.id)
         .maybeSingle();
 
