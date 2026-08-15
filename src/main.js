@@ -924,56 +924,133 @@ function profilePage() {
         </div>
       `
   }
-</div>
-      ${
-        state.isAdmin
-          ? `
-            <div class="notice">
-              🛡️ Bu hesap yönetici hesabıdır.
-            </div>
-          `
-          : ""
-      }
+</div>function profilePage() {
+  const points = state.profile?.points ?? 0;
 
-      <div class="section-head">
-        <h2>Videolarım</h2>
+  const username =
+    state.profile?.username || "";
+
+  const displayName =
+    state.profile?.display_name || "";
+
+  return `
+    <section class="container narrow page-top">
+
+      <p class="eyebrow">
+        PROFİL
+      </p>
+
+      <h1>
+        ${escapeHtml(
+          displayName ||
+          username ||
+          state.user?.email ||
+          "Kullanıcı"
+        )}
+      </h1>
+
+      <p class="muted">
+        @${escapeHtml(username)}
+      </p>
+
+      <div class="profile-stats">
+
+        <div class="profile-stat">
+          <strong>${points}</strong>
+          <span>Puan</span>
+        </div>
+
       </div>
 
-      <div class="profile-videos">
+      <div class="profile-edit-card">
+
+        <div class="section-head">
+          <h2>Profil Bilgileri</h2>
+        </div>
+
+        <form id="profile-form">
+
+          <label>
+            Görünen Ad
+
+            <input
+              id="profile-display-name"
+              type="text"
+              value="${escapeHtml(displayName)}"
+              placeholder="Adınız veya görünen adınız"
+              maxlength="80"
+              required
+            >
+          </label>
+
+          <label>
+            Kullanıcı Adı
+
+            <input
+              id="profile-username"
+              type="text"
+              value="${escapeHtml(username)}"
+              placeholder="kullaniciadi"
+              maxlength="30"
+              required
+            >
+          </label>
+
+          <button
+            class="button primary"
+            type="submit"
+          >
+            Profili Kaydet
+          </button>
+
+          <div
+            id="profile-message"
+            class="form-message"
+          ></div>
+
+        </form>
+
+      </div>
+
+      <div class="section-head">
+        <h2>Puan Geçmişi</h2>
+      </div>
+
+      <div class="point-history">
 
         ${
-          state.myVideos.length
-            ? state.myVideos
-                .map((video) => {
+          state.pointTransactions?.length
+            ? state.pointTransactions
+                .map((transaction) => {
 
-                  const statusText =
-                    video.status === "approved"
-                      ? "🟢 Yayında"
-                      : video.status === "pending"
-                        ? "⏳ Onay Bekliyor"
-                        : "🔴 Reddedildi";
+                  const amount =
+                    Number(transaction.amount);
+
+                  const sign =
+                    amount > 0 ? "+" : "";
+
+                  const date =
+                    new Date(
+                      transaction.created_at
+                    ).toLocaleString("tr-TR");
 
                   return `
-                    <div class="profile-video">
+                    <div class="point-history-item">
 
                       <div>
                         <strong>
                           ${escapeHtml(
-                            video.title ||
-                            "Başlıksız video"
+                            transaction.reason
                           )}
                         </strong>
 
                         <small>
-                          ${escapeHtml(
-                            video.categories?.name ||
-                            "Diğer"
-                          )}
+                          ${escapeHtml(date)}
                         </small>
                       </div>
 
-                      <span>
-                        ${statusText}
+                      <span class="point-amount">
+                        ${sign}${amount} puan
                       </span>
 
                     </div>
@@ -982,12 +1059,85 @@ function profilePage() {
                 .join("")
             : `
               <div class="empty">
-                Henüz video göndermedin.
+                Henüz puan hareketi yok.
               </div>
             `
         }
 
       </div>
+
+      <div class="section-head">
+        <h2>Videolarım</h2>
+      </div>
+
+      ${
+        state.myVideos?.length
+          ? `
+            <div class="grid">
+
+              ${state.myVideos
+                .map((video) => {
+
+                  const status =
+                    video.status || "pending";
+
+                  return `
+                    <article class="card">
+
+                      ${
+                        video.thumbnail_url
+                          ? `
+                            <img
+                              src="${escapeHtml(
+                                video.thumbnail_url
+                              )}"
+                              alt=""
+                              loading="lazy"
+                            >
+                          `
+                          : ""
+                      }
+
+                      <div class="card-body">
+
+                        <span class="tag">
+                          ${escapeHtml(status)}
+                        </span>
+
+                        <h3>
+                          ${escapeHtml(
+                            video.title ||
+                            "Başlıksız video"
+                          )}
+                        </h3>
+
+                        ${
+                          video.categories?.name
+                            ? `
+                              <p>
+                                ${escapeHtml(
+                                  video.categories.name
+                                )}
+                              </p>
+                            `
+                            : ""
+                        }
+
+                      </div>
+
+                    </article>
+                  `;
+                })
+                .join("")}
+
+            </div>
+          `
+          : `
+            <div class="empty">
+              Henüz video göndermediniz.
+            </div>
+          `
+      }
 
     </section>
   `;
