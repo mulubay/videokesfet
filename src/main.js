@@ -1867,17 +1867,108 @@ if (
 
         const description =
           form.get("description");
-
-        const id =
-          youtubeId(url);
-    
-console.log("URL:", url);
-console.log("YOUTUBE ID:", id);
-
-        const message =
+   const message =
           document.querySelector(
             "#form-message"
           );
+        const id =
+          youtubeId(url);
+    const channelUrl =
+  state.profile?.youtube_channel_url?.trim();
+
+if (!channelUrl) {
+  message.textContent =
+    "Önce Profil bölümünden YouTube kanalınızı kaydetmelisiniz.";
+  return;
+}
+
+if (!id) {
+  message.textContent =
+    "Geçerli bir YouTube video bağlantısı girin.";
+  return;
+}
+
+try {
+
+  const oembedResponse =
+    await fetch(
+      `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`
+    );
+
+  if (!oembedResponse.ok) {
+    throw new Error(
+      "YouTube video bilgisi alınamadı."
+    );
+  }
+
+  const oembed =
+    await oembedResponse.json();
+
+  const normalizeChannelUrl = (value) => {
+
+    try {
+
+      const parsed =
+        new URL(value);
+
+      return (
+        parsed.origin +
+        parsed.pathname
+      )
+        .replace(/\/+$/, "")
+        .toLowerCase();
+
+    } catch {
+      return "";
+    }
+  };
+
+  const savedChannel =
+    normalizeChannelUrl(channelUrl);
+
+  const videoChannel =
+    normalizeChannelUrl(
+      oembed.author_url
+    );
+
+  console.log(
+    "Kayıtlı kanal:",
+    savedChannel
+  );
+
+  console.log(
+    "Videonun kanalı:",
+    videoChannel
+  );
+
+  if (
+    !savedChannel ||
+    !videoChannel ||
+    savedChannel !== videoChannel
+  ) {
+
+    message.textContent =
+      "Bu video kayıtlı YouTube kanalınızla eşleşmiyor. Yalnızca kendi kanalınızdaki videoları ekleyebilirsiniz.";
+
+    return;
+  }
+
+} catch (error) {
+
+  console.error(
+    "YouTube kanal kontrolü hatası:",
+    error
+  );
+
+  message.textContent =
+    "Video sahibi doğrulanamadı. Lütfen YouTube bağlantısını kontrol edin.";
+
+  return;
+}
+console.log("URL:", url);
+console.log("YOUTUBE ID:", id);
+
+     
 
         message.textContent =
           "Gönderiliyor...";
