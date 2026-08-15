@@ -1593,17 +1593,27 @@ console.log(
         message.textContent =
           "İşleniyor...";
 
-        const result =
-          action === "signup"
-            ? await supabase.auth.signUp({
-                email,
-                password
-              })
-            : await supabase.auth.signInWithPassword({
-                email,
-                password
-              });
+       const referralCode =
+  new URLSearchParams(
+    window.location.search
+  ).get("ref");
 
+const result =
+  action === "signup"
+    ? await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            referral_code:
+              referralCode || null
+          }
+        }
+      })
+    : await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
         if (result.error) {
 
           message.textContent =
