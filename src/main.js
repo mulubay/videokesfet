@@ -210,6 +210,23 @@ async function loadData() {
   state.isAdmin = false;
 
   if (state.user) {
+        const {
+      data: dailyLoginReward,
+      error: dailyLoginError
+    } = await supabase.rpc(
+      "claim_daily_login"
+    );
+
+    if (dailyLoginError) {
+      console.error(
+        "Daily login reward error:",
+        dailyLoginError
+      );
+    } else if (dailyLoginReward) {
+      console.log(
+        "Günlük giriş ödülü: +2 puan"
+      );
+    }
     const { data: profile, error: profileError } =
       await supabase
         .from("profiles")
