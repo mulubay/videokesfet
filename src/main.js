@@ -77,6 +77,12 @@ function youtubeId(url = "") {
     return "";
   }
 }
+console.log(
+  "YOUTUBE ID TEST:",
+  youtubeId(
+    "https://youtube.com/shorts/KuU7aKBcaHE?si=test"
+  )
+);
 function videoCard(v) {
   const thumb =
     v.thumbnail_url ||
