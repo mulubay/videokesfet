@@ -1588,7 +1588,10 @@ if (profileForm) {
           .querySelector("#profile-display-name")
           ?.value
           .trim();
-
+const youtubeChannelUrl =
+  document.querySelector(
+    "#profile-youtube-channel"
+  ).value.trim();
       const username =
         document
           .querySelector("#profile-username")
