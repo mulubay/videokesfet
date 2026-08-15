@@ -588,7 +588,14 @@ function discoverPage() {
       <h1>
         Yeni videolar bul.
       </h1>
-
+<div class="discover-search">
+  <input
+    id="video-search"
+    type="search"
+    placeholder="Video veya kanal ara..."
+    autocomplete="off"
+  >
+</div>
       <div class="filters">
 
         <button
@@ -1498,7 +1505,67 @@ function bind() {
       }
     );
 
+document
+  .querySelector("#video-search")
+  ?.addEventListener("input", (event) => {
 
+    const search =
+      event.target.value
+        .trim()
+        .toLocaleLowerCase("tr-TR");
+
+    const approvedVideos =
+      state.videos.filter(
+        (video) =>
+          video.status === "approved"
+      );
+
+    const list =
+      approvedVideos.filter((video) => {
+
+        const title =
+          String(
+            video.title || ""
+          ).toLocaleLowerCase("tr-TR");
+
+        const creator =
+          String(
+            video.profiles?.display_name ||
+            video.profiles?.username ||
+            ""
+          ).toLocaleLowerCase("tr-TR");
+
+        const description =
+          String(
+            video.description || ""
+          ).toLocaleLowerCase("tr-TR");
+
+        return (
+          !search ||
+          title.includes(search) ||
+          creator.includes(search) ||
+          description.includes(search)
+        );
+      });
+
+    const grid =
+      document.querySelector(
+        "#discover-grid"
+      );
+
+    if (grid) {
+      grid.innerHTML =
+        list
+          .map(videoCard)
+          .join("") ||
+        `
+          <div class="empty">
+            Aramanızla eşleşen video bulunamadı.
+          </div>
+        `;
+    }
+
+  });
   document
     .querySelectorAll("[data-category]")
     .forEach((button) => {
