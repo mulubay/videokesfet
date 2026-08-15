@@ -1370,7 +1370,129 @@ function bind() {
    * PROFİL FORMU
    */
 
- 
+ const profileForm =
+  document.querySelector("#profile-form");
+
+if (profileForm) {
+
+  profileForm.addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+      if (!supabase || !state.user) {
+        return;
+      }
+
+      const displayName =
+        document
+          .querySelector("#profile-display-name")
+          ?.value
+          .trim();
+
+      const username =
+        document
+          .querySelector("#profile-username")
+          ?.value
+          .trim()
+          .toLowerCase();
+
+      const message =
+        document.querySelector(
+          "#profile-message"
+        );
+
+      if (!displayName || !username) {
+
+        if (message) {
+          message.textContent =
+            "Lütfen tüm alanları doldurun.";
+        }
+
+        return;
+      }
+
+      if (message) {
+        message.textContent =
+          "Profil kaydediliyor...";
+      }
+
+      const { error } =
+        await supabase
+          .from("profiles")
+          .update({
+            display_name: displayName,
+            username: username
+          })
+          .eq("id", state.user.id);
+
+      if (error) {
+
+        console.error(
+          "Profile update error:",
+          error
+        );
+
+        if (message) {
+          message.textContent =
+            `Profil kaydedilemedi: ${error.message}`;
+        }
+
+        return;
+      }
+
+      state.profile = {
+        ...state.profile,
+        display_name: displayName,
+        username: username
+      };
+
+      const {
+        data: rewardGranted,
+        error: rewardError
+      } = await supabase.rpc(
+        "complete_profile"
+      );
+
+      if (rewardError) {
+
+        console.error(
+          "Profile reward error:",
+          rewardError
+        );
+
+        if (message) {
+          message.textContent =
+            "Profil kaydedildi ancak puan ödülü alınamadı.";
+        }
+
+      } else if (rewardGranted) {
+
+        if (message) {
+          message.textContent =
+            "Profil tamamlandı! +10 puan kazandınız. 🎉";
+        }
+
+      } else {
+
+        if (message) {
+          message.textContent =
+            "Profiliniz başarıyla güncellendi.";
+        }
+
+      }
+
+      await loadData();
+
+      state.view = "profile";
+
+      render();
+
+    }
+  );
+
+}
 
   /*
    * GİRİŞ / KAYIT
