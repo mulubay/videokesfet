@@ -1544,6 +1544,8 @@ function applyDiscoverFilters() {
 
   const category =
     state.selectedCategory || "all";
+  const videoType =
+  state.selectedVideoType || "all";
 
   const approvedVideos =
     state.videos.filter(
@@ -1558,7 +1560,18 @@ function applyDiscoverFilters() {
         category === "all" ||
         String(video.category_id) ===
           String(category);
-
+const videoTypeMatch =
+  videoType === "all" ||
+  (
+    videoType === "shorts" &&
+    String(video.youtube_url || "")
+      .includes("/shorts/")
+  ) ||
+  (
+    videoType === "video" &&
+    !String(video.youtube_url || "")
+      .includes("/shorts/")
+  );
       const title =
         String(
           video.title || ""
@@ -1582,10 +1595,11 @@ function applyDiscoverFilters() {
         creator.includes(search) ||
         description.includes(search);
 
-      return (
-        categoryMatch &&
-        searchMatch
-      );
+  return (
+  categoryMatch &&
+  videoTypeMatch &&
+  searchMatch
+);
     });
 
   const grid =
