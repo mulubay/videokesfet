@@ -1753,43 +1753,70 @@ function initYouTubePlayer() {
 
   function updateProgress() {
 
-    if (unlocked) return;
+  if (unlocked) return;
 
-    const remaining =
-      Math.max(
-        0,
-        REQUIRED_SECONDS - watchedSeconds
-      );
+  const watched =
+    Math.min(
+      watchedSeconds,
+      REQUIRED_SECONDS
+    );
 
-    if (remaining <= 0) {
+  const remaining =
+    Math.max(
+      0,
+      REQUIRED_SECONDS - watched
+    );
 
-      unlocked = true;
+  if (remaining <= 0) {
 
-      if (externalLink) {
+    unlocked = true;
 
-        externalLink.disabled = false;
+    if (externalLink) {
 
-        externalLink.textContent =
-          "YouTube'da Aç ↗";
+      externalLink.disabled = false;
 
-        externalLink.onclick = () => {
+      externalLink.textContent =
+        "YouTube'da Aç ↗";
 
-          const url =
-            externalLink.dataset.youtubeUrl;
+      externalLink.onclick = () => {
 
-          if (url) {
+        const url =
+          externalLink.dataset.youtubeUrl;
 
-            window.open(
-              url,
-              "_blank",
-              "noopener,noreferrer"
-            );
+        if (url) {
 
-          }
+          window.open(
+            url,
+            "_blank",
+            "noopener,noreferrer"
+          );
 
-        };
+        }
 
-      }
+      };
+
+    }
+
+    if (progressElement) {
+
+      progressElement.textContent =
+        "✅ 30 / 30 saniye izlendi — 🔓 YouTube bağlantısı artık açılabilir.";
+
+    }
+
+    stopTracking();
+
+    return;
+  }
+
+  if (progressElement) {
+
+    progressElement.textContent =
+      `▶️ ${watched} / 30 saniye izlendi · 🔒 YouTube bağlantısı için ${remaining} saniye daha izle.`;
+
+  }
+
+}
 
       if (progressElement) {
 
