@@ -1655,9 +1655,9 @@ if (profileForm) {
 
         const id =
           youtubeId(url);
-        console.log(
-  "ÇIKAN YOUTUBE ID:",
-  id
+    
+console.log("URL:", url);
+console.log("YOUTUBE ID:", id);
 );
 
         const message =
