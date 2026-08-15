@@ -827,12 +827,10 @@ function loginPage() {
 }
 
 function profilePage() {
+  const points = state.profile?.points ?? 0;
 
   return `
-
-    <section
-      class="container narrow page-top"
-    >
+    <section class="container narrow page-top">
 
       <p class="eyebrow">
         PROFİL
@@ -840,29 +838,85 @@ function profilePage() {
 
       <h1>
         ${escapeHtml(
-          state.user?.email || ""
+          state.profile?.display_name ||
+          state.profile?.username ||
+          state.user?.email ||
+          "Kullanıcı"
         )}
       </h1>
 
+      <p class="lead">
+        ${escapeHtml(state.user?.email || "")}
+      </p>
+
       <div class="profile-stat">
-        <strong>0</strong>
+        <strong>${points}</strong>
         <span>Puan</span>
       </div>
-
-      <p>
-        Profil ve puan sistemi bir sonraki
-        sürümde genişletilecek.
-      </p>
 
       ${
         state.isAdmin
           ? `
             <div class="notice">
-              Bu hesap yönetici hesabıdır.
+              🛡️ Bu hesap yönetici hesabıdır.
             </div>
           `
           : ""
       }
+
+      <div class="section-head">
+        <h2>Videolarım</h2>
+      </div>
+
+      <div class="profile-videos">
+
+        ${
+          state.myVideos.length
+            ? state.myVideos
+                .map((video) => {
+
+                  const statusText =
+                    video.status === "approved"
+                      ? "🟢 Yayında"
+                      : video.status === "pending"
+                        ? "⏳ Onay Bekliyor"
+                        : "🔴 Reddedildi";
+
+                  return `
+                    <div class="profile-video">
+
+                      <div>
+                        <strong>
+                          ${escapeHtml(
+                            video.title ||
+                            "Başlıksız video"
+                          )}
+                        </strong>
+
+                        <small>
+                          ${escapeHtml(
+                            video.categories?.name ||
+                            "Diğer"
+                          )}
+                        </small>
+                      </div>
+
+                      <span>
+                        ${statusText}
+                      </span>
+
+                    </div>
+                  `;
+                })
+                .join("")
+            : `
+              <div class="empty">
+                Henüz video göndermedin.
+              </div>
+            `
+        }
+
+      </div>
 
     </section>
   `;
