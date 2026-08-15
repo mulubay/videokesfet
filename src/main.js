@@ -87,9 +87,23 @@ function youtubeId(url = "") {
 }
 
 function videoCard(v) {
+
   const thumb =
     v.thumbnail_url ||
     `https://i.ytimg.com/vi/${v.youtube_id}/hqdefault.jpg`;
+
+  const isShorts =
+    String(v.youtube_url || "")
+      .includes("/shorts/");
+
+  const creator =
+    v.profiles?.display_name ||
+    v.profiles?.username ||
+    "İçerik üreticisi";
+
+  const isOwnVideo =
+    state.user &&
+    v.user_id === state.user.id;
 
   return `
     <article class="card">
@@ -97,37 +111,83 @@ function videoCard(v) {
       <button
         class="video-card-button"
         data-video-id="${escapeHtml(v.youtube_id)}"
-        data-video-title="${escapeHtml(v.title || "Video")}"
+        data-video-title="${escapeHtml(
+          v.title || "Video"
+        )}"
       >
-        <img
-          src="${escapeHtml(thumb)}"
-          alt=""
-          loading="lazy"
-        >
+
+        <div class="video-card-thumb">
+
+          <img
+            src="${escapeHtml(thumb)}"
+            alt=""
+            loading="lazy"
+          >
+
+          ${
+            isShorts
+              ? `
+                <span class="video-type-badge">
+                  Shorts
+                </span>
+              `
+              : ""
+          }
+
+        </div>
 
         <div class="card-body">
 
-          <span class="tag">
-            ${escapeHtml(v.categories?.name || "Diğer")}
-          </span>
+          <div class="video-card-meta">
+
+            <span class="tag">
+              ${escapeHtml(
+                v.categories?.name || "Diğer"
+              )}
+            </span>
+
+            ${
+              !isOwnVideo
+                ? `
+                  <span class="points-badge">
+                    +5 Puan
+                  </span>
+                `
+                : `
+                  <span class="video-owner-badge">
+                    Senin videon
+                  </span>
+                `
+            }
+
+          </div>
 
           <h3>
-            ${escapeHtml(v.title || "Başlıksız video")}
+            ${escapeHtml(
+              v.title || "Başlıksız video"
+            )}
           </h3>
 
           <p>
-            ${escapeHtml(
-              v.profiles?.display_name ||
-              v.profiles?.username ||
-              "İçerik üreticisi"
-            )}
+            ${escapeHtml(creator)}
           </p>
+
+          ${
+            !isOwnVideo
+              ? `
+                <small class="watch-reward">
+                  30 saniye izle → +5 puan
+                </small>
+              `
+              : ""
+          }
 
           <span class="button">
             ▶ Videoyu İzle
           </span>
 
         </div>
+
       </button>
 
     </article>
