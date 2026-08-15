@@ -1859,7 +1859,48 @@ function initYouTubePlayer() {
 
     }
   }
+function bindVideoCards() {
 
+  document
+    .querySelectorAll(".video-card-button")
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+          const videoId =
+            button.dataset.videoId;
+
+          if (!videoId) return;
+
+          const selectedVideo =
+            state.videos.find(
+              (video) =>
+                video.youtube_id === videoId
+            );
+
+          if (!selectedVideo) return;
+
+          state.selectedVideo =
+            selectedVideo;
+
+          state.view = "watch";
+
+          render();
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
+        }
+      );
+
+    });
+}
   function startTracking() {
 
     if (interval) return;
