@@ -1763,16 +1763,6 @@ function initYouTubePlayer() {
         return;
       }
 
-      /*
-       * Kural:
-       *
-       * Video 60 saniyeden uzunsa:
-       *     30 saniye izle
-       *
-       * Video 60 saniyeden kısaysa:
-       *     videonun %50'sini izle
-       */
-
       const requiredSeconds =
         Math.min(
           30,
@@ -1822,6 +1812,7 @@ function initYouTubePlayer() {
             }
 
           };
+
         }
 
         if (progressElement) {
@@ -1859,48 +1850,7 @@ function initYouTubePlayer() {
 
     }
   }
-function bindVideoCards() {
 
-  document
-    .querySelectorAll(".video-card-button")
-    .forEach((button) => {
-
-      button.addEventListener(
-        "click",
-        (event) => {
-
-          event.preventDefault();
-
-          const videoId =
-            button.dataset.videoId;
-
-          if (!videoId) return;
-
-          const selectedVideo =
-            state.videos.find(
-              (video) =>
-                video.youtube_id === videoId
-            );
-
-          if (!selectedVideo) return;
-
-          state.selectedVideo =
-            selectedVideo;
-
-          state.view = "watch";
-
-          render();
-
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-          });
-
-        }
-      );
-
-    });
-}
   function startTracking() {
 
     if (interval) return;
@@ -2021,11 +1971,6 @@ function bindVideoCards() {
       );
   }
 
-  /*
-   * YouTube API zaten hazırsa
-   * hemen player oluştur.
-   */
-
   if (
     window.YT &&
     typeof window.YT.Player ===
@@ -2036,11 +1981,6 @@ function bindVideoCards() {
 
     return;
   }
-
-  /*
-   * API henüz yüklenmemişse
-   * script'i yalnızca bir kez ekle.
-   */
 
   let script =
     document.querySelector(
@@ -2062,14 +2002,6 @@ function bindVideoCards() {
     );
 
   }
-
-  /*
-   * Callback yerine kısa aralıklarla
-   * API'nin hazır olup olmadığını kontrol ediyoruz.
-   *
-   * Bu yöntem önceki callback çakışmasını
-   * ortadan kaldırıyor.
-   */
 
   let attempts = 0;
 
@@ -2109,6 +2041,51 @@ function bindVideoCards() {
       }
 
     }, 100);
+
+}
+
+
+function bindVideoCards() {
+
+  document
+    .querySelectorAll(".video-card-button")
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+          const videoId =
+            button.dataset.videoId;
+
+          if (!videoId) return;
+
+          const selectedVideo =
+            state.videos.find(
+              (video) =>
+                video.youtube_id === videoId
+            );
+
+          if (!selectedVideo) return;
+
+          state.selectedVideo =
+            selectedVideo;
+
+          state.view = "watch";
+
+          render();
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
+        }
+      );
+
+    });
 
 }
 
