@@ -614,18 +614,20 @@ function watchPage() {
 
         <div class="video-frame">
 
-          <iframe
-            src="https://www.youtube.com/embed/${escapeHtml(embedId)}"
-            title="${escapeHtml(
-              video.title || "YouTube videosu"
-            )}"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
+          <div
+            id="youtube-player"
+            data-video-id="${escapeHtml(embedId)}"
+          ></div>
 
         </div>
 
+      </div>
+
+      <div
+        id="watch-progress"
+        class="watch-progress"
+      >
+        Video hazırlanıyor...
       </div>
 
       <span class="tag">
@@ -663,14 +665,17 @@ function watchPage() {
       }
 
       <a
-        class="button secondary"
+        id="youtube-external-link"
+        class="button secondary disabled"
         href="${escapeHtml(
           video.youtube_url
         )}"
         target="_blank"
         rel="noopener"
+        aria-disabled="true"
+        tabindex="-1"
       >
-        YouTube'da Aç ↗
+        🔒 YouTube'da Aç
       </a>
 
     </section>
