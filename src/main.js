@@ -1202,137 +1202,6 @@ function bind() {
     .forEach((button) => {
 
       button.addEventListener(
-
-        const profileForm =
-  document.querySelector("#profile-form");
-
-if (profileForm) {
-
-  profileForm.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-      if (!supabase || !state.user) {
-        return;
-      }
-
-      const displayName =
-        document
-          .querySelector(
-            "#profile-display-name"
-          )
-          ?.value
-          .trim();
-
-      const username =
-        document
-          .querySelector(
-            "#profile-username"
-          )
-          ?.value
-          .trim()
-          .toLowerCase();
-
-      const message =
-        document.querySelector(
-          "#profile-message"
-        );
-
-      if (!displayName || !username) {
-
-        if (message) {
-          message.textContent =
-            "Lütfen tüm alanları doldurun.";
-        }
-
-        return;
-      }
-
-      if (message) {
-        message.textContent =
-          "Profil kaydediliyor...";
-      }
-
-      const { error } =
-        await supabase
-          .from("profiles")
-          .update({
-            display_name: displayName,
-            username: username
-          })
-          .eq("id", state.user.id);
-
-      if (error) {
-
-        console.error(
-          "Profile update error:",
-          error
-        );
-
-        if (message) {
-          message.textContent =
-            `Profil kaydedilemedi: ${error.message}`;
-        }
-
-        return;
-      }
-
-      // Profil bilgilerini state içinde güncelle
-      state.profile = {
-        ...state.profile,
-        display_name: displayName,
-        username: username
-      };
-
-      // Profil tamamlama ödülünü iste
-      const {
-        data: rewardGranted,
-        error: rewardError
-      } = await supabase.rpc(
-        "complete_profile"
-      );
-
-      if (rewardError) {
-
-        console.error(
-          "Profile reward error:",
-          rewardError
-        );
-
-        if (message) {
-          message.textContent =
-            "Profil kaydedildi ancak puan ödülü alınamadı.";
-        }
-
-      } else {
-
-        if (rewardGranted) {
-
-          if (message) {
-            message.textContent =
-              "Profil tamamlandı! +10 puan kazandınız. 🎉";
-          }
-
-        } else {
-
-          if (message) {
-            message.textContent =
-              "Profiliniz başarıyla güncellendi.";
-          }
-        }
-      }
-
-      // Güncel verileri tekrar yükle
-      await loadData();
-
-      state.view = "profile";
-
-      render();
-    }
-  );
-}
         "click",
         (event) => {
 
@@ -1368,48 +1237,45 @@ if (profileForm) {
 
     });
 
- document
-  .querySelectorAll("[data-view]")
-  .forEach((button) => {
 
-    button.addEventListener(
-      "click",
-      async (event) => {
+  document
+    .querySelectorAll("[data-view]")
+    .forEach((button) => {
 
-        event.preventDefault();
+      button.addEventListener(
+        "click",
+        async (event) => {
 
-        const targetView =
-          button.getAttribute(
-            "data-view"
-          );
+          event.preventDefault();
 
-        if (!targetView) return;
+          const targetView =
+            button.getAttribute(
+              "data-view"
+            );
 
-        state.view = targetView;
+          if (!targetView) return;
 
-        /*
-         * Profil sayfasına girildiğinde
-         * Supabase'deki güncel puanı ve
-         * videoları yeniden çek.
-         */
-        if (
-          targetView === "profile" &&
-          state.user
-        ) {
-          await loadData();
+          state.view = targetView;
+
+          if (
+            targetView === "profile" &&
+            state.user
+          ) {
+            await loadData();
+          }
+
+          render();
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
         }
+      );
 
-        render();
+    });
 
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-
-      }
-    );
-
-  });
 
   document
     .querySelector("#logout")
@@ -1430,8 +1296,10 @@ if (profileForm) {
         await loadData();
 
         render();
+
       }
     );
+
 
   document
     .querySelectorAll("[data-category]")
@@ -1444,11 +1312,9 @@ if (profileForm) {
           document
             .querySelectorAll(".filter")
             .forEach((filter) => {
-
               filter.classList.remove(
                 "active"
               );
-
             });
 
           button.classList.add(
@@ -1496,6 +1362,363 @@ if (profileForm) {
 
     });
 
+
+  bindVideoCards();
+
+
+  /*
+   * PROFİL FORMU
+   */
+
+  const profileForm =
+    document.querySelector(
+      "#profile-form"
+    );
+
+  if (profileForm) {
+
+    profileForm.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        if (
+          !supabase ||
+          !state.user
+        ) {
+          return;
+        }
+
+        const displayName =
+          document
+            .querySelector(
+              "#profile-display-name"
+            )
+            ?.value
+            .trim();
+
+        const username =
+          document
+            .querySelector(
+              "#profile-username"
+            )
+            ?.value
+            .trim()
+            .toLowerCase();
+
+        const message =
+          document.querySelector(
+            "#profile-message"
+          );
+
+        if (
+          !displayName ||
+          !username
+        ) {
+
+          if (message) {
+            message.textContent =
+              "Lütfen tüm alanları doldurun.";
+          }
+
+          return;
+        }
+
+        if (message) {
+          message.textContent =
+            "Profil kaydediliyor...";
+        }
+
+        const { error } =
+          await supabase
+            .from("profiles")
+            .update({
+              display_name:
+                displayName,
+              username:
+                username
+            })
+            .eq(
+              "id",
+              state.user.id
+            );
+
+        if (error) {
+
+          console.error(
+            "Profile update error:",
+            error
+          );
+
+          if (message) {
+            message.textContent =
+              `Profil kaydedilemedi: ${error.message}`;
+          }
+
+          return;
+        }
+
+        state.profile = {
+          ...state.profile,
+          display_name:
+            displayName,
+          username:
+            username
+        };
+
+        const {
+          data: rewardGranted,
+          error: rewardError
+        } = await supabase.rpc(
+          "complete_profile"
+        );
+
+        if (rewardError) {
+
+          console.error(
+            "Profile reward error:",
+            rewardError
+          );
+
+          if (message) {
+            message.textContent =
+              "Profil kaydedildi ancak puan ödülü alınamadı.";
+          }
+
+        } else if (rewardGranted) {
+
+          if (message) {
+            message.textContent =
+              "Profil tamamlandı! +10 puan kazandınız. 🎉";
+          }
+
+        } else {
+
+          if (message) {
+            message.textContent =
+              "Profiliniz başarıyla güncellendi.";
+          }
+
+        }
+
+        await loadData();
+
+        state.view =
+          "profile";
+
+        render();
+
+      }
+    );
+
+  }
+
+
+  /*
+   * GİRİŞ / KAYIT
+   */
+
+  document
+    .querySelector("#auth-form")
+    ?.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        if (!supabase) return;
+
+        const form =
+          new FormData(event.target);
+
+        const action =
+          form.get("action");
+
+        const email =
+          form.get("email");
+
+        const password =
+          form.get("password");
+
+        const message =
+          document.querySelector(
+            "#auth-message"
+          );
+
+        message.textContent =
+          "İşleniyor...";
+
+        const result =
+          action === "signup"
+            ? await supabase.auth.signUp({
+                email,
+                password
+              })
+            : await supabase.auth.signInWithPassword({
+                email,
+                password
+              });
+
+        if (result.error) {
+
+          message.textContent =
+            result.error.message;
+
+          return;
+
+        }
+
+        await loadData();
+
+        state.view =
+          "home";
+
+        render();
+
+      }
+    );
+
+
+  /*
+   * VİDEO FORMU
+   */
+
+  document
+    .querySelector("#video-form")
+    ?.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        if (
+          !supabase ||
+          !state.user
+        ) {
+          return;
+        }
+
+        const form =
+          new FormData(event.target);
+
+        const url =
+          form.get("url");
+
+        const title =
+          form.get("title");
+
+        const category =
+          form.get("category");
+
+        const description =
+          form.get("description");
+
+        const id =
+          youtubeId(url);
+
+        const message =
+          document.querySelector(
+            "#form-message"
+          );
+
+        message.textContent =
+          "Gönderiliyor...";
+
+        const { error } =
+          await supabase
+            .from("videos")
+            .insert({
+              user_id:
+                state.user.id,
+
+              youtube_url:
+                url,
+
+              youtube_id:
+                id,
+
+              title:
+                title,
+
+              description:
+                description,
+
+              category_id:
+                Number(category),
+
+              status:
+                "pending"
+            });
+
+        if (error) {
+
+          message.textContent =
+            error.message;
+
+          return;
+
+        }
+
+        event.target.reset();
+
+        message.textContent =
+          "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
+
+      }
+    );
+
+
+  /*
+   * ADMIN - ONAYLA
+   */
+
+  document
+    .querySelectorAll(
+      ".approve-video"
+    )
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          await updateVideoStatus(
+            button.dataset.id,
+            "approved"
+          );
+
+        }
+      );
+
+    });
+
+
+  /*
+   * ADMIN - REDDET
+   */
+
+  document
+    .querySelectorAll(
+      ".reject-video"
+    )
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          await updateVideoStatus(
+            button.dataset.id,
+            "rejected"
+          );
+
+        }
+      );
+
+    });
+
+}
   bindVideoCards();
 
   document
