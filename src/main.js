@@ -20,7 +20,8 @@ const state = {
   myVideos: [],
   pointTransactions: [],
   isAdmin: false,
-  selectedVideo: null
+  selectedVideo: null,
+  selectedCategory: "all"
 };
 
 
