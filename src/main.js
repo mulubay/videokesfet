@@ -1619,14 +1619,19 @@ const youtubeChannelUrl =
           "Profil kaydediliyor...";
       }
 
-      const { error } =
-        await supabase
-          .from("profiles")
-          .update({
-            display_name: displayName,
-            username: username
-          })
-          .eq("id", state.user.id);
+   const { error } =
+  await supabase
+    .from("profiles")
+    .update({
+      display_name: displayName,
+      username: username,
+      youtube_channel_url:
+        youtubeChannelUrl || null
+    })
+    .eq(
+      "id",
+      state.user.id
+    );
 
       if (error) {
 
