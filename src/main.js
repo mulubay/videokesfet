@@ -2379,7 +2379,16 @@ const progressFill =
       watchedSeconds,
       REQUIRED_SECONDS
     );
+const progressPercent =
+  Math.min(
+    100,
+    (watched / REQUIRED_SECONDS) * 100
+  );
 
+if (progressFill) {
+  progressFill.style.width =
+    `${progressPercent}%`;
+}
   const remaining =
     Math.max(
       0,
