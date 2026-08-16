@@ -432,3 +432,104 @@
   font-size: 13px;
   color: #666;
 }
+/* =========================
+   VİDEO BİLDİR MODALI
+   ========================= */
+
+.report-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.report-modal {
+  position: relative;
+
+  width: min(520px, 100%);
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  padding: 24px;
+
+  background: #ffffff;
+  border-radius: 18px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.report-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.report-modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.report-modal-close {
+  width: 36px;
+  height: 36px;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #f1f3f5;
+
+  font-size: 24px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.report-modal-close:hover {
+  background: #e5e7eb;
+}
+
+.report-modal select,
+.report-modal textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  margin-top: 8px;
+  margin-bottom: 18px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #d9dde3;
+  border-radius: 10px;
+
+  font: inherit;
+  background: #ffffff;
+}
+
+.report-modal select {
+  min-height: 44px;
+}
+
+.report-modal textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.report-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 10px;
+  margin-top: 8px;
+}
