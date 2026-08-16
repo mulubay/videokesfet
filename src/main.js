@@ -777,44 +777,75 @@ function watchPage() {
         </div>
 
       </div>
-<div class="watch-reward-card">
+${
+  state.user
+    ? `
+      <div class="watch-reward-card">
 
-  <div class="watch-reward-header">
+        <div class="watch-reward-header">
 
-    <div>
-      <strong>
-        ⭐ İzleme Ödülü
-      </strong>
+          <div>
+            <strong>
+              ⭐ İzleme Ödülü
+            </strong>
 
-      <span>
-        30 saniye izle
-      </span>
-    </div>
+            <span>
+              30 saniye izle
+            </span>
+          </div>
 
-    <strong id="watch-reward-points">
-      +5 Puan
-    </strong>
+          <strong id="watch-reward-points">
+            +5 Puan
+          </strong>
 
-  </div>
+        </div>
 
-  <div class="watch-progress-bar">
+        <div class="watch-progress-bar">
 
-    <div
-      id="watch-progress-fill"
-      class="watch-progress-fill"
-      style="width: 0%;"
-    ></div>
+          <div
+            id="watch-progress-fill"
+            class="watch-progress-fill"
+            style="width: 0%;"
+          ></div>
 
-  </div>
+        </div>
 
-  <div
-    id="watch-progress"
-    class="watch-progress"
-  >
-    Video hazırlanıyor...
-  </div>
+        <div
+          id="watch-progress"
+          class="watch-progress"
+        >
+          Video hazırlanıyor...
+        </div>
 
-</div>
+      </div>
+    `
+    : `
+      <div class="watch-reward-card">
+
+        <div class="watch-reward-header">
+
+          <div>
+            <strong>
+              🔒 Puan kazanmak ister misin?
+            </strong>
+
+            <span>
+              30 saniye video izle ve +5 puan kazan.
+            </span>
+          </div>
+
+        </div>
+
+        <button
+          class="button primary"
+          data-view="register"
+        >
+          Ücretsiz Hesap Oluştur
+        </button>
+
+      </div>
+    `
+}
 
       <span class="tag">
         ${escapeHtml(
