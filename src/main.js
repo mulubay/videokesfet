@@ -1685,6 +1685,9 @@ function bind() {
         await loadData();
 
         render();
+        
+      }
+    );
  
 // ARAMA + KATEGORİ FİLTRELEME
 
