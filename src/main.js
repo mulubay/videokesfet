@@ -2399,7 +2399,8 @@ console.log("YOUTUBE ID:", id);
 
       event.preventDefault();
       event.stopPropagation();
-
+ const videoId =
+      button.dataset.videoId;
       console.log(
         "BİLDİR BUTONUNA TIKLANDI"
       );
