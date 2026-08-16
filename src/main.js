@@ -1536,7 +1536,8 @@ function adminPage() {
       (video) =>
         video.status === "pending"
     );
-
+const videoReports =
+  state.videoReports || [];
   return `
 
     <section
