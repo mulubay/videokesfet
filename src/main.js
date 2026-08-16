@@ -2582,7 +2582,10 @@ console.log("YOUTUBE ID:", id);
           "Video bildirim hatası:",
           error
         );
-
+alert(
+  "HATA:\n" +
+  JSON.stringify(error, null, 2)
+);
         if (
           error.code === "23505"
         ) {
