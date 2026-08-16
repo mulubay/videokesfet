@@ -514,6 +514,8 @@ function render() {
   bind();
     if (state.view === "watch") {
     initYouTubePlayer();
+        initReportButton();
+
   }
 }
 
@@ -1683,177 +1685,7 @@ function bind() {
         await loadData();
 
         render();
-  /*
-   * VIDEO - BİLDİR
-   */
-
-  document
-    .addEventListener(
-      "click",
-      (event) => {
-
-        const button =
-          event.target.closest(
-            "#report-video-button"
-          );
-
-        if (!button) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        const videoId =
-          button.dataset.videoId;
-
-        console.log(
-          "BİLDİR BUTONUNA TIKLANDI:",
-          videoId
-        );
-
-        const modal =
-          document.createElement("div");
-
-        modal.id =
-          "report-video-modal";
-
-        modal.innerHTML = `
-          <div class="report-modal-backdrop">
-
-            <div class="report-modal">
-
-              <div class="report-modal-header">
-
-                <h2>
-                  Videoyu Bildir
-                </h2>
-
-                <button
-                  type="button"
-                  class="report-modal-close"
-                  id="close-report-modal"
-                >
-                  ×
-                </button>
-
-              </div>
-
-              <p class="muted">
-                Bu videoyu neden bildirmek istiyorsunuz?
-              </p>
-
-              <form id="report-video-form">
-
-                <label>
-                  Bildirim nedeni
-
-                  <select
-                    id="report-reason"
-                    required
-                  >
-                    <option value="">
-                      Bir neden seçin
-                    </option>
-
-                    <option value="inappropriate">
-                      🚫 Uygunsuz içerik
-                    </option>
-
-                    <option value="copyright">
-                      ©️ Telif hakkı ihlali
-                    </option>
-
-                    <option value="unavailable">
-                      🔗 Video artık mevcut değil
-                    </option>
-
-                    <option value="misleading">
-                      ⚠️ Yanlış / yanıltıcı içerik
-                    </option>
-
-                    <option value="spam">
-                      📢 Spam
-                    </option>
-
-                    <option value="other">
-                      Diğer
-                    </option>
-                  </select>
-                </label>
-
-                <label>
-                  Açıklama
-                  <span class="muted">
-                    (isteğe bağlı)
-                  </span>
-
-                  <textarea
-                    id="report-description"
-                    rows="4"
-                    maxlength="500"
-                    placeholder="Sorunu kısaca açıklayabilirsiniz."
-                  ></textarea>
-                </label>
-
-                <div
-                  id="report-message"
-                  class="form-message"
-                ></div>
-
-                <div class="report-modal-actions">
-
-                  <button
-                    type="button"
-                    class="button secondary"
-                    id="cancel-report"
-                  >
-                    Vazgeç
-                  </button>
-
-                  <button
-                    type="submit"
-                    class="button primary"
-                  >
-                    Bildir
-                  </button>
-
-                </div>
-
-              </form>
-
-            </div>
-
-          </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        const closeModal = () => {
-          modal.remove();
-        };
-
-        document
-          .querySelector(
-            "#close-report-modal"
-          )
-          ?.addEventListener(
-            "click",
-            closeModal
-          );
-
-        document
-          .querySelector(
-            "#cancel-report"
-          )
-          ?.addEventListener(
-            "click",
-            closeModal
-          );
-
-      }
-    );
-      }
-    );
-
+ 
 // ARAMA + KATEGORİ FİLTRELEME
 
 function applyDiscoverFilters() {
@@ -2548,6 +2380,142 @@ console.log("YOUTUBE ID:", id);
 
     });
 
+}
+      function initReportButton() {
+
+  const button =
+    document.querySelector(
+      "#report-video-button"
+    );
+
+  if (!button) return;
+
+  button.addEventListener(
+    "click",
+    (event) => {
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      console.log(
+        "BİLDİR BUTONUNA TIKLANDI"
+      );
+
+      const modal =
+        document.createElement("div");
+
+      modal.id =
+        "report-video-modal";
+
+      modal.innerHTML = `
+        <div class="report-modal-backdrop">
+
+          <div class="report-modal">
+
+            <div class="report-modal-header">
+
+              <h2>
+                Videoyu Bildir
+              </h2>
+
+              <button
+                type="button"
+                id="close-report-modal"
+                class="report-modal-close"
+              >
+                ×
+              </button>
+
+            </div>
+
+            <p class="muted">
+              Bu videoyu neden bildirmek istiyorsunuz?
+            </p>
+
+            <select
+              id="report-reason"
+              required
+            >
+              <option value="">
+                Bir neden seçin
+              </option>
+
+              <option value="inappropriate">
+                🚫 Uygunsuz içerik
+              </option>
+
+              <option value="copyright">
+                ©️ Telif hakkı ihlali
+              </option>
+
+              <option value="unavailable">
+                🔗 Video artık mevcut değil
+              </option>
+
+              <option value="misleading">
+                ⚠️ Yanlış / yanıltıcı içerik
+              </option>
+
+              <option value="spam">
+                📢 Spam
+              </option>
+
+              <option value="other">
+                Diğer
+              </option>
+
+            </select>
+
+            <textarea
+              id="report-description"
+              rows="4"
+              maxlength="500"
+              placeholder="Sorunu kısaca açıklayabilirsiniz."
+            ></textarea>
+
+            <div class="report-modal-actions">
+
+              <button
+                type="button"
+                id="cancel-report"
+                class="button secondary"
+              >
+                Vazgeç
+              </button>
+
+              <button
+                type="button"
+                id="submit-report"
+                class="button primary"
+              >
+                Bildir
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      document
+        .querySelector("#close-report-modal")
+        ?.addEventListener(
+          "click",
+          () => modal.remove()
+        );
+
+      document
+        .querySelector("#cancel-report")
+        ?.addEventListener(
+          "click",
+          () => modal.remove()
+        );
+
+    }
+  );
 }
 function initYouTubePlayer() {
 
