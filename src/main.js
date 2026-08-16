@@ -2516,6 +2516,104 @@ console.log("YOUTUBE ID:", id);
           "click",
           () => modal.remove()
         );
+      document
+  .querySelector("#submit-report")
+  ?.addEventListener(
+    "click",
+    async () => {
+
+      const reason =
+        document.querySelector(
+          "#report-reason"
+        )?.value;
+
+      const description =
+        document.querySelector(
+          "#report-description"
+        )?.value.trim() || "";
+
+      if (!reason) {
+
+        alert(
+          "Lütfen bir bildirim nedeni seçin."
+        );
+
+        return;
+      }
+
+      if (!state.user) {
+
+        alert(
+          "Bildirim göndermek için giriş yapmalısınız."
+        );
+
+        return;
+      }
+
+      const submitButton =
+        document.querySelector(
+          "#submit-report"
+        );
+
+      submitButton.disabled = true;
+      submitButton.textContent =
+        "Gönderiliyor...";
+
+      const { error } =
+        await supabase
+          .from("video_reports")
+          .insert({
+            video_id:
+              Number(videoId),
+
+            reporter_id:
+              state.user.id,
+
+            reason:
+              reason,
+
+            description:
+              description || null
+          });
+
+      if (error) {
+
+        console.error(
+          "Video bildirim hatası:",
+          error
+        );
+
+        if (
+          error.code === "23505"
+        ) {
+
+          alert(
+            "Bu videoyu daha önce bildirdiniz."
+          );
+
+        } else {
+
+          alert(
+            "Bildirim gönderilemedi. Lütfen tekrar deneyin."
+          );
+
+        }
+
+        submitButton.disabled = false;
+        submitButton.textContent =
+          "Bildir";
+
+        return;
+      }
+
+      alert(
+        "Bildiriminiz alındı. Teşekkür ederiz."
+      );
+
+      modal.remove();
+
+    }
+  );
 
     }
   );
