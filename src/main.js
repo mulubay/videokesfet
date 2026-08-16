@@ -2453,7 +2453,6 @@ if (progressFill) {
 });
 
 }
-
     if (externalLink) {
 
       externalLink.disabled = false;
