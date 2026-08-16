@@ -2332,7 +2332,184 @@ console.log("YOUTUBE ID:", id);
       }
     );
 
+/*
+ * VIDEO - BİLDİR
+ */
 
+document
+  .querySelectorAll(
+    "#report-video-button"
+  )
+  .forEach((button) => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const existingModal =
+          document.querySelector(
+            "#report-video-modal"
+          );
+
+        if (existingModal) {
+          existingModal.remove();
+        }
+
+        const videoId =
+          button.dataset.videoId;
+
+        const modal =
+          document.createElement("div");
+
+        modal.id =
+          "report-video-modal";
+
+        modal.innerHTML = `
+
+          <div class="report-modal-backdrop">
+
+            <div class="report-modal">
+
+              <div class="report-modal-header">
+
+                <h2>
+                  Videoyu Bildir
+                </h2>
+
+                <button
+                  type="button"
+                  class="report-modal-close"
+                  id="close-report-modal"
+                >
+                  ×
+                </button>
+
+              </div>
+
+              <p class="muted">
+                Bu videoyu neden bildirmek
+                istiyorsunuz?
+              </p>
+
+              <form id="report-video-form">
+
+                <label>
+                  Bildirim nedeni
+
+                  <select
+                    id="report-reason"
+                    required
+                  >
+                    <option value="">
+                      Bir neden seçin
+                    </option>
+
+                    <option value="inappropriate">
+                      🚫 Uygunsuz içerik
+                    </option>
+
+                    <option value="copyright">
+                      ©️ Telif hakkı ihlali
+                    </option>
+
+                    <option value="unavailable">
+                      🔗 Video artık mevcut değil
+                    </option>
+
+                    <option value="misleading">
+                      ⚠️ Yanlış / yanıltıcı içerik
+                    </option>
+
+                    <option value="spam">
+                      📢 Spam
+                    </option>
+
+                    <option value="other">
+                      Diğer
+                    </option>
+
+                  </select>
+
+                </label>
+
+                <label>
+
+                  Açıklama
+                  <span class="muted">
+                    (isteğe bağlı)
+                  </span>
+
+                  <textarea
+                    id="report-description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Sorunu kısaca açıklayabilirsiniz."
+                  ></textarea>
+
+                </label>
+
+                <div
+                  id="report-message"
+                  class="form-message"
+                ></div>
+
+                <div class="report-modal-actions">
+
+                  <button
+                    type="button"
+                    class="button secondary"
+                    id="cancel-report"
+                  >
+                    Vazgeç
+                  </button>
+
+                  <button
+                    type="submit"
+                    class="button primary"
+                  >
+                    Bildir
+                  </button>
+
+                </div>
+
+              </form>
+
+            </div>
+
+          </div>
+
+        `;
+
+        document.body.appendChild(
+          modal
+        );
+
+        const closeModal = () => {
+          modal.remove();
+        };
+
+        document
+          .querySelector(
+            "#close-report-modal"
+          )
+          ?.addEventListener(
+            "click",
+            closeModal
+          );
+
+        document
+          .querySelector(
+            "#cancel-report"
+          )
+          ?.addEventListener(
+            "click",
+            closeModal
+          );
+
+      }
+    );
+
+  });
   /*
    * ADMIN - ONAYLA
    */
