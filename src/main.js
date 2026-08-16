@@ -19,6 +19,7 @@ const state = {
   profile: null,
   myVideos: [],
   pointTransactions: [],
+  videoReports: [],
   isAdmin: false,
   selectedVideo: null,
   selectedCategory: "all",
@@ -414,6 +415,52 @@ if (myVideosError) {
   } else {
     state.videos = vids || [];
   }
+}
+
+async function loadVideoReports() {
+
+  if (!supabase || !state.isAdmin) {
+    state.videoReports = [];
+    return;
+  }
+
+  const { data, error } =
+    await supabase
+      .from("video_reports")
+      .select(`
+        id,
+        video_id,
+        reporter_id,
+        reason,
+        description,
+        status,
+        created_at,
+        videos (
+          id,
+          title,
+          youtube_url,
+          status
+        )
+      `)
+      .order(
+        "created_at",
+        { ascending: false }
+      );
+
+  if (error) {
+
+    console.error(
+      "Video bildirimleri yüklenemedi:",
+      error
+    );
+
+    state.videoReports = [];
+
+    return;
+  }
+
+  state.videoReports =
+    data || [];
 }
 function captureReferralCode() {
   const ref =
