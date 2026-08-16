@@ -2624,7 +2624,9 @@ if (progressFill) {
                 YT.PlayerState.PLAYING
               ) {
 
-                startTracking();
+                  if (state.user) {
+    startTracking();
+  }
 
               } else {
 
