@@ -892,7 +892,22 @@ ${
 >
   🔒 YouTube'da Aç
 </button>
-
+${
+  state.user
+    ? `
+      <button
+        id="report-video-button"
+        class="button secondary report-video-button"
+        type="button"
+        data-video-id="${escapeHtml(
+          video.id
+        )}"
+      >
+        🚩 Videoyu Bildir
+      </button>
+    `
+    : ""
+}
     </section>
   `;
 }
