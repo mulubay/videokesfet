@@ -384,6 +384,10 @@ if (myVideosError) {
 } else {
   state.myVideos = myVideos || [];
 }
+if (state.isAdmin) {
+  await loadVideoReports();
+}
+    
   }
 
   let videoQuery = supabase
