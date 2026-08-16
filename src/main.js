@@ -2532,7 +2532,7 @@ if (progressFill) {
 }
 
   function startTracking() {
-
+   if (!state.user) return;
     if (interval || unlocked) return;
 
     console.log(
