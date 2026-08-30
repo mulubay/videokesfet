@@ -1585,6 +1585,127 @@ const videoReports =
             `
         }
 
+      <div class="section-head">
+
+        <h2>
+          🚩 Bildirilen Videolar
+          (${videoReports.length})
+        </h2>
+
+      </div>
+
+      <div
+        id="reports-grid"
+        class="grid"
+      >
+
+        ${
+          videoReports.length
+            ? videoReports
+                .map((report) => {
+
+                  const video =
+                    report.videos || {};
+
+                  return `
+                    <article class="card">
+
+                      <div class="card-body">
+
+                        <div class="video-card-meta">
+
+                          <span class="tag">
+                            ${escapeHtml(
+                              report.reason
+                            )}
+                          </span>
+
+                          <span class="tag">
+                            ${escapeHtml(
+                              report.status
+                            )}
+                          </span>
+
+                        </div>
+
+                        <h3>
+                          ${escapeHtml(
+                            video.title ||
+                            "Video bilgisi bulunamadı"
+                          )}
+                        </h3>
+
+                        ${
+                          report.description
+                            ? `
+                              <p>
+                                ${escapeHtml(
+                                  report.description
+                                )}
+                              </p>
+                            `
+                            : ""
+                        }
+
+                        <p class="muted">
+                          Bildirim:
+                          ${new Date(
+                            report.created_at
+                          ).toLocaleString(
+                            "tr-TR"
+                          )}
+                        </p>
+
+                        <div class="admin-actions">
+
+                          ${
+                            video.youtube_url
+                              ? `
+                                <a
+                                  class="button secondary"
+                                  href="${escapeHtml(
+                                    video.youtube_url
+                                  )}"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  ▶ Videoyu Aç
+                                </a>
+                              `
+                              : ""
+                          }
+
+                          <button
+                            class="button primary resolve-report"
+                            data-id="${report.id}"
+                          >
+                            ✓ Çözüldü
+                          </button>
+
+                          <button
+                            class="button secondary dismiss-report"
+                            data-id="${report.id}"
+                          >
+                            ✕ Reddet
+                          </button>
+
+                        </div>
+
+                      </div>
+
+                    </article>
+                  `;
+                })
+                .join("")
+            : `
+              <div class="empty">
+                Bildirilmiş video yok. 🎉
+              </div>
+            `
+        }
+
+      </div>
+
       </div>
 
     </section>
@@ -2682,7 +2803,7 @@ await loadData();
 
       const { error } =
         await supabase
-          .from("video_reports")
+          .from("")
           .insert({
             video_id:
               Number(videoId),
