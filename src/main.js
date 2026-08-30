@@ -2340,9 +2340,7 @@ try {
 console.log("URL:", url);
 console.log("YOUTUBE ID:", id);
 
-/*
- * AYNI VİDEO KONTROLÜ
- */
+/* AYNI VİDEO KONTROLÜ */
 
 const {
   data: existingVideo,
@@ -2354,7 +2352,6 @@ const {
   .maybeSingle();
 
 if (duplicateCheckError) {
-
   console.error(
     "Duplicate video check error:",
     duplicateCheckError
@@ -2366,19 +2363,11 @@ if (duplicateCheckError) {
   return;
 }
 
-/*
- * Video daha önce eklenmişse
- */
+/* Video daha önce eklenmişse */
 
 if (existingVideo) {
 
   if (existingVideo.status === "rejected") {
-
-    /*
-     * Reddedilmiş videoyu tekrar göndermeye izin veriyoruz.
-     * Eski kaydı silip yeni gönderi oluşturmak yerine
-     * şimdilik mevcut kaydı güncelleyeceğiz.
-     */
 
     const { error: retryError } =
       await supabase
@@ -2394,7 +2383,6 @@ if (existingVideo) {
         .eq("id", existingVideo.id);
 
     if (retryError) {
-
       message.textContent =
         retryError.message;
 
@@ -2419,6 +2407,8 @@ if (existingVideo) {
   return;
 }
 
+/* YENİ VİDEOYU EKLE */
+
 message.textContent =
   "Gönderiliyor...";
 
@@ -2426,53 +2416,41 @@ const { error } =
   await supabase
     .from("videos")
     .insert({
-     
+      user_id:
+        state.user.id,
 
-        message.textContent =
-          "Gönderiliyor...";
+      youtube_url:
+        url,
 
-        const { error } =
-          await supabase
-            .from("videos")
-            .insert({
-              user_id:
-                state.user.id,
+      youtube_id:
+        id,
 
-              youtube_url:
-                url,
+      title:
+        title,
 
-              youtube_id:
-                id,
+      description:
+        description,
 
-              title:
-                title,
+      category_id:
+        Number(category),
 
-              description:
-                description,
+      status:
+        "pending"
+    });
 
-              category_id:
-                Number(category),
+if (error) {
+  message.textContent =
+    error.message;
 
-              status:
-                "pending"
-            });
+  return;
+}
 
-        if (error) {
+event.target.reset();
 
-          message.textContent =
-            error.message;
+message.textContent =
+  "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
 
-          return;
-
-        }
-
-        event.target.reset();
-
-        message.textContent =
-          "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
-
-      }
-    );
+await loadData();
 
   /*
    * ADMIN - ONAYLA
