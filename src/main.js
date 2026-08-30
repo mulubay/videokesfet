@@ -2340,6 +2340,92 @@ try {
 console.log("URL:", url);
 console.log("YOUTUBE ID:", id);
 
+/*
+ * AYNI VİDEO KONTROLÜ
+ */
+
+const {
+  data: existingVideo,
+  error: duplicateCheckError
+} = await supabase
+  .from("videos")
+  .select("id, status")
+  .eq("youtube_id", id)
+  .maybeSingle();
+
+if (duplicateCheckError) {
+
+  console.error(
+    "Duplicate video check error:",
+    duplicateCheckError
+  );
+
+  message.textContent =
+    "Video kontrol edilirken bir hata oluştu.";
+
+  return;
+}
+
+/*
+ * Video daha önce eklenmişse
+ */
+
+if (existingVideo) {
+
+  if (existingVideo.status === "rejected") {
+
+    /*
+     * Reddedilmiş videoyu tekrar göndermeye izin veriyoruz.
+     * Eski kaydı silip yeni gönderi oluşturmak yerine
+     * şimdilik mevcut kaydı güncelleyeceğiz.
+     */
+
+    const { error: retryError } =
+      await supabase
+        .from("videos")
+        .update({
+          user_id: state.user.id,
+          youtube_url: url,
+          title: title,
+          description: description,
+          category_id: Number(category),
+          status: "pending"
+        })
+        .eq("id", existingVideo.id);
+
+    if (retryError) {
+
+      message.textContent =
+        retryError.message;
+
+      return;
+    }
+
+    event.target.reset();
+
+    message.textContent =
+      "Daha önce reddedilen videonuz yeniden moderasyona gönderildi.";
+
+    await loadData();
+
+    return;
+  }
+
+  message.textContent =
+    existingVideo.status === "pending"
+      ? "Bu video zaten moderasyon için bekliyor."
+      : "Bu video VideoKeşfet'e daha önce eklenmiş.";
+
+  return;
+}
+
+message.textContent =
+  "Gönderiliyor...";
+
+const { error } =
+  await supabase
+    .from("videos")
+    .insert({
      
 
         message.textContent =
