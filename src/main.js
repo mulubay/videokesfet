@@ -373,7 +373,9 @@ const { data: myVideos, error: myVideosError } =
     .select("*, categories(name)")
     .eq("user_id", state.user.id)
     .order("created_at", { ascending: false });
-
+console.log("CURRENT USER ID:", state.user.id);
+console.log("MY VIDEOS:", myVideos);
+console.log("MY VIDEOS ERROR:", myVideosError);
 if (myVideosError) {
   console.error(
     "My videos loading error:",
