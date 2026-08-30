@@ -2451,7 +2451,9 @@ message.textContent =
   "Videon gönderildi. Moderasyon sonrası keşfette görünecek.";
 
 await loadData();
-
+  }
+    );
+  
   /*
    * ADMIN - ONAYLA
    */
